@@ -18,7 +18,7 @@
 
     1.0   -   Script created
     
-.LINKS
+.LINK
 
 #>
 
