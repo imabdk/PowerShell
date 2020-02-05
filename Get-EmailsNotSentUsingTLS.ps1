@@ -8,7 +8,7 @@
     If any of the e-mails in those past 16 minutes are delayed due to lack of TLS support with the recipient, the script will send a custom e-mail to the sender right away.
 
 .NOTES
-    Filename: Get-EmailsNotSentUsingTLS.ps1
+    Filename: Get-EmailsNotSendUsingTLS.ps1
     Version: 1.0
     Author: Martin Bengtsson
     Blog: www.imab.dk
@@ -137,14 +137,14 @@ foreach ($email in $emailsPending) {
                                 </head>
                             <body>
                                 <h1>Attention: Your e-mail has NOT been delivered!</h1>
-				<p>Your e-mail sent to $recipient, sent on $timestamp (UTC+0), with the subject: '$subject', has not been delivered.</p>
+								<p>Your e-mail sent to $recipient, sent on $timestamp (UTC+0), with the subject: '$subject', has not been delivered.</p>
 
                                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce at ultricies erat. Duis ac aliquet massa. Vestibulum bibendum at velit vel volutpat.<br>
                                 Donec vel orci tristique, pulvinar felis nec, finibus quam. Phasellus pulvinar leo est, et efficitur eros sollicitudin non. Nunc congue porta eleifend.<br> 
                                 Pellentesque aliquet sagittis egestas. Nam eget efficitur mauris. Maecenas at commodo nisi. Pellentesque fermentum neque posuere convallis congue.<br> 
                                 Curabitur eu diam risus. Proin ipsum eros, pellentesque nec tempus non, feugiat consectetur tortor.</p>
 
-				<p>Best regards,<br><a href=$url>www.imab.dk</a></p>
+								<p>Best regards,<br><a href=$url>www.imab.dk</a></p>
                             </body>
                             </html>
                             "
@@ -195,14 +195,14 @@ foreach ($email in $emailsPending) {
                                 </head>
                             <body>
                                 <h1>Attention: Your e-mail has NOT been delivered!</h1>
-				<p>Your e-mail sent to $recipient, sent on $timestamp (UTC+0), with the subject: '$subject', has not been delivered.</p>
+								<p>Your e-mail sent to $recipient, sent on $timestamp (UTC+0), with the subject: '$subject', has not been delivered.</p>
 
                                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce at ultricies erat. Duis ac aliquet massa. Vestibulum bibendum at velit vel volutpat.<br>
                                 Donec vel orci tristique, pulvinar felis nec, finibus quam. Phasellus pulvinar leo est, et efficitur eros sollicitudin non. Nunc congue porta eleifend.<br> 
                                 Pellentesque aliquet sagittis egestas. Nam eget efficitur mauris. Maecenas at commodo nisi. Pellentesque fermentum neque posuere convallis congue.<br> 
                                 Curabitur eu diam risus. Proin ipsum eros, pellentesque nec tempus non, feugiat consectetur tortor.</p>
 
-				<p>Best regards,<br><a href=$url>www.imab.dk</a></p>
+								<p>Best regards,<br><a href=$url>www.imab.dk</a></p>
                             </body>
                             </html>
                             "
