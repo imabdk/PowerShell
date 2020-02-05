@@ -56,6 +56,7 @@ $automaticReply = "Automatic reply:*"
 $sendingDomain = "*@imab.dk"
 
 # Reasons reported when e-mails are pending due to lack of TLS support
+# These are the reasons report I have found. Maybe there is more? If so, they can easily be added
 $reason0 = "Cannot connect to remote server"
 $reason1 = "STARTTLS is required to send mail"
 $reason2 = "Security status InvalidToken"
@@ -68,12 +69,12 @@ $dateEnd = Get-Date -f $RegionDateFormat
 $dateStart = $dateEnd.AddMinutes(-16)
 
 # Get all emails from the last 16 minutes which are pending and not an automatic reply
+# Automatic replies are filtered out. We don't want to trigger an e-mail based on an out of office reply
 $emailsPending = @()
 $emailsPending = Get-MessageTrace -StartDate $dateStart.ToUniversalTime() -EndDate $dateEnd.ToUniversalTime() | Where-Object {$_.Status -eq "Pending" -AND $_.Subject -notlike $automaticReply} | Select-Object Received,SenderAddress,RecipientAddress,MessageTraceID,Subject
 
 # Loop through each e-mail found
 Write-Verbose -Verbose -Message "Looping through each e-mail message with a status of pending in the Exchange Online queue"
-
 foreach ($email in $emailsPending) {
     
     $timestamp = $email.Received
@@ -83,6 +84,7 @@ foreach ($email in $emailsPending) {
     $subject = $email.Subject
 
     # Get further message details from each e-mail
+    # This is needed to see the exact cause of why the email is pending
     try {
         $result = Get-MessageTraceDetail -SenderAddress $sender -RecipientAddress $recipient -MessageTraceId $messageid
     }
@@ -158,7 +160,7 @@ foreach ($email in $emailsPending) {
                         }
                     }
 
-                    # Looking for a third reason to 
+                    # Looking for a third reason to the email being delayed (reason2)
                     elseif (($detail -match $reason0) -AND ($detail -match $reason2)) {
 
                         # E-mail being sent internally in the sending domain is not interesting. Only grabbing e-mails going out externally
