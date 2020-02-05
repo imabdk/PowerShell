@@ -1,4 +1,4 @@
-﻿<#
+<#
 .DESCRIPTION
     When forcing TLS encryption on outgoing e-mails due to GDPR requirements, Exchange Online will try sending the e-mail for 24 hours before dropping it and returning a default NDR (non-delivery report).
 
@@ -22,9 +22,12 @@
 
 #>
 
+# Azure automation credentials
+# EDIT these to match your own credentials
 $AzureCredentials = Get-AutomationPSCredential -Name "AzureAutomation"
 $hlpCredentials = Get-AutomationPSCredential -Name "hlp"
 
+# Connect to the Exchange Online Management module (this is available in the module gallery in Azure Automation)
 if (Get-Module -Name ExchangeOnlineManagement -ListAvailable) {
     try {
         Write-Verbose -Verbose -Message "Connecting to Exchange Online using $AzureCredentials"
@@ -42,6 +45,7 @@ elseif (-NOT(Get-Module -Name ExchangeOnlineManagement -ListAvailable)) {
 }
 
 # Office 365 and other variables
+# EDIT this to suit your needs
 $emailSmtp = "smtp.office365.com"
 $emailPort = "587"
 $emailFrom = "hlp@imab.dk"
