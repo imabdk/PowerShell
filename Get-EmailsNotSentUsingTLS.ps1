@@ -8,7 +8,7 @@
     If any of the e-mails in those past 16 minutes are delayed due to lack of TLS support with the recipient, the script will send a custom e-mail to the sender right away.
 
 .NOTES
-    Filename: Get-EmailsNotSendUsingTLS.ps1
+    Filename: Get-EmailsNotSentUsingTLS.ps1
     Version: 1.0
     Author: Martin Bengtsson
     Blog: www.imab.dk
