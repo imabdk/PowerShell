@@ -50,9 +50,9 @@ function Search-CMLogFile {
 
             foreach ($String in $SearchString){
                 if ($LogMessage -match $String) {
-				    Write-Output $LogData[$i]
-				    break loop
-			    }
+			Write-Output $LogData[$i]
+			break loop
+	    	}
             }
         }
     }
