@@ -4,7 +4,7 @@
    
 .DESCRIPTION
     Searches registry for applications registered with 'Zoom' as publisher. If any found, the uninstall string is retrieved and used to uninstall the application.
-    If applications are found to be installed in the users profile, the users profile is invoked and the application is uninstalled coming from SYSTEM context.
+    If applications are found to be installed in the users profile, the logged on user's context is invoked and the application is uninstalled coming from SYSTEM context.
 
 .NOTES
     Filename: Uninstall-EverythingZoom.ps1
