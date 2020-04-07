@@ -13,7 +13,7 @@
     Blog: www.imab.dk
     Twitter: @mwbengtsson
 
-.LINKS
+.LINK
     
 #> 
 
