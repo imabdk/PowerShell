@@ -16,7 +16,7 @@
     Twitter: @mwbengtsson
 
 .LINK
-    
+    https://www.imab.dk/uninstall-all-zoom-applications-in-a-jiffy-using-configuration-manager-and-powershell/    
 #> 
 
 function Execute-AsLoggedOnUser($Command,$Hidden=$true) {
