@@ -1,10 +1,12 @@
-﻿<#
+<#
 .SYNOPSIS
-    Uninstalls all Zoom applications registered with the Windows installer. Whether they are installed to the local computer or the users profile.
+    Uninstalls all Zoom applications registered with the Windows installer. 
+    Whether they are installed to the local computer or the users profile.
    
 .DESCRIPTION
-    Searches registry for applications registered with 'Zoom' as publisher. If any found, the uninstall string is retrieved and used to uninstall the application.
-    If applications are found to be installed in the users profile, the logged on user's context is invoked and the application is uninstalled coming from SYSTEM context.
+    Searches registry for applications registered with 'Zoom' as publisher. 
+    If any found, the uninstall string is retrieved and used to uninstall the application.
+    If applications are found to be installed in the users profile, the users context is invoked and the application is uninstalled coming from SYSTEM context.
 
 .NOTES
     Filename: Uninstall-EverythingZoom.ps1
@@ -14,7 +16,6 @@
     Twitter: @mwbengtsson
 
 .LINK
-    https://www.imab.dk/uninstall-all-zoom-applications-in-a-jiffy-using-configuration-manager-and-powershell/
     
 #> 
 
@@ -344,9 +345,7 @@ function Uninstall-ZoomLocalMachine() {
     Write-Verbose -Verbose -Message "Running Uninstall-ZoomLocalMachine function"
     $registryPath = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
     if (Test-Path -Path $registryPath) {
-
         $installedZoomApps = Get-ChildItem -Path $registryPath -Recurse | Get-ItemProperty | Where-Object {$_.Publisher -like "Zoom*" } | Select-Object Displayname,UninstallString
-
         if ($installedZoomApps) {
             Write-Verbose -Verbose -Message "Installed Zoom applications found in HKLM"
             foreach ($zoomApp in $installedZoomApps) {
@@ -374,6 +373,12 @@ function Uninstall-ZoomLocalMachine() {
                 }
             }
         }
+        else {
+            Write-Verbose -Verbose -Message "No Zoom applications found in HKLM"
+        }
+    }
+    else {
+        Write-Verbose -Verbose -Message "Registry path not found"
     }
 }
 
@@ -386,27 +391,32 @@ function Uninstall-ZoomCurrentUser() {
         # Formatting the username in a separate variable
         $userName = $userProfile.UserHive.Split("\")[2]
         $registryPath = "Registry::HKEY_USERS\$($UserProfile.SID)\Software\Microsoft\Windows\CurrentVersion\Uninstall"
-
         if (Test-Path -Path $registryPath) {
-            $installedZoomApps = Get-ChildItem -Path Registry::HKEY_USERS\$($UserProfile.SID)\Software\Microsoft\Windows\CurrentVersion\Uninstall -Recurse | Get-ItemProperty | Where-Object {$_.Publisher -like "Zoom*" } | Select-Object Displayname,UninstallString
+            $installedZoomApps = Get-ChildItem -Path $registryPath -Recurse | Get-ItemProperty | Where-Object {$_.Publisher -like "Zoom*" } | Select-Object Displayname,UninstallString
             if ($installedZoomApps) {
-                Write-Verbose -Verbose -Message "Installed Zoom applications found in HKCU"
+                Write-Verbose -Verbose -Message "Installed Zoom applications found in HKCU for user: $userName"
                 foreach ($zoomApp in $installedZoomApps) {
                     if ($zoomApp.UninstallString) {
                         $userCommand = '-command &{Start-Process "C:\Users\USERNAME\AppData\Roaming\Zoom\uninstall\Installer.exe" -ArgumentList "/uninstall" -Wait}'
                         # Replacing the placeholder: USERNAME with the actual username retrieved from the userprofile
                         # This can probably be done smarter, but I failed to find another method
-                        $userCommand = $userCommand -replace 'USERNAME',$userName
+                        $userCommand = $userCommand -replace "USERNAME",$userName
                         try {
-                            Write-Verbose -Verbose -Message "Uninstalling application: $($zoomApp.DisplayName) as the logged on user"
+                            Write-Verbose -Verbose -Message "Uninstalling application: $($zoomApp.DisplayName) as the logged on user: $userName"
                             Execute-AsLoggedOnUser -Command $userCommand
                         }
                         catch {
-                            Write-Error -Message "Failed to uninstall application: $($zoomApp.DisplayName)"
+                            Write-Error -Message "Failed to uninstall application: $($zoomApp.DisplayName) for user: $userName"
                         }
                     }
                 }
             }
+            else {
+                Write-Verbose -Verbose -Message "No Zoom applications found in HKCU for user: $userName"
+            }
+        }
+        else {
+            Write-Verbose -Verbose -Message "Registry path not found for user: $userName"
         }
     }
 }
