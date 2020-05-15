@@ -72,7 +72,6 @@ function Get-TeamsDesktopConfig() {
                 $false
             }
         }
-
         else {
             Write-Verbose -Verbose -Message "Teams install location not found"
             $false
@@ -117,9 +116,7 @@ if ($getTeamsDesktopConfigStatus -eq $True) {
         Write-Verbose -Verbose -Message "Failed to get content of Teams config file at $teamsConfigPath. Breaking script"
         break
     }
-
     if ($teamsConfigContent) {
-
         try {
             Write-Verbose -Verbose -Message "Converting Teams config content from JSON format"
             $json = ConvertFrom-Json -InputObject $teamsConfigContent
@@ -148,7 +145,6 @@ if ($getTeamsDesktopConfigStatus -eq $True) {
                 catch { 
                     Write-Verbose -Verbose -Message "Failed to modify Teams settings"
                 }
-
                 try {
                     Write-Verbose -Verbose -Message "Modifying Teams setting: registerAsIMProvider. Setting value to $registerAsIMProvider"
                     $json.appPreferenceSettings.registerAsIMProvider = $registerAsIMProvider
@@ -176,7 +172,6 @@ if ($getTeamsDesktopConfigStatus -eq $True) {
                 catch { 
                     Write-Verbose -Verbose -Message "Failed to modify Teams setting: registerAsIMProvider"
                 }
-
                 try {
                     Write-Verbose -Verbose -Message "Creating and converting new content to Teams config file"
                     $newContent = $json | ConvertTo-Json
@@ -186,7 +181,6 @@ if ($getTeamsDesktopConfigStatus -eq $True) {
                 catch { 
                     Write-Verbose -Verbose -Message "Failed to create and convert new content to Teams config file"   
                 }
-
                 if (($newContent) -AND ($teamsInstallLocation)) {
                     try {
                         Write-Verbose -Verbose -Message "Launching Microsoft Teams post processing config changes"
@@ -200,5 +194,4 @@ if ($getTeamsDesktopConfigStatus -eq $True) {
         }
     }
 }
-
 Write-Verbose -Verbose -Message "Script is done running. Thank you"
