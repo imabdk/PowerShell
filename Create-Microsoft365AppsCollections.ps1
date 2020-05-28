@@ -14,7 +14,7 @@
     Twitter: @mwbengtsson
 
 .LINK
-    https://www.imab.dk/create-device-collections-for-the-new-microsoft-365-apps-update-channels-in-a-jiffy-using-powershell
+    https://www.imab.dk/use-powershell-to-create-device-collections-in-configuration-manager-for-the-new-microsoft-365-apps-update-channels/
 
 .CREDIT
     Credit to Benoit Lecours from www.systemcenterdudes.com. Creation of collections are kindly borrowed from his script: https://gallery.technet.microsoft.com/Set-of-Operational-SCCM-19fa8178
