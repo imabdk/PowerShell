@@ -6,6 +6,12 @@
     Create collections in Microsoft Endpoint Manager Configuration Manager for Microsoft 365 Apps
     Specifically collections based on the new update channels as well as a general Pilot and Production collection. Everything used for deployment of updates for Microsoft 365 Apps
 
+.PARAMETER siteCode
+    Specify the Configuration Manager Site Code
+
+.PARAMETER siteServer
+    Specify FQDN of the Configuration Manager Site Server
+
 .NOTES
     Filename: Create-Microsoft365AppsCollections.ps1
     Version: 1.0
@@ -17,7 +23,6 @@
 
 .LINK
     https://www.imab.dk/use-powershell-to-create-device-collections-in-configuration-manager-for-the-new-microsoft-365-apps-update-channels/
-
 #>
 
 param(
