@@ -19,7 +19,7 @@
     Blog: www.imab.dk
     Twitter: @mwbengtsson
 
-    Credit: Credit to Benoit Lecours from www.systemcenterdudes.com. Creation of collections are kindly borrowed from his script: https://gallery.technet.microsoft.com/Set-of-Operational-SCCM-19fa8178
+    Credit: Credit to Benoit Lecours from www.systemcenterdudes.com. Logic of creation of collections are kindly borrowed from his script: https://gallery.technet.microsoft.com/Set-of-Operational-SCCM-19fa8178
 
 .LINK
     https://www.imab.dk/use-powershell-to-create-device-collections-in-configuration-manager-for-the-new-microsoft-365-apps-update-channels/
