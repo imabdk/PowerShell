@@ -67,8 +67,8 @@ begin {
 
     ### VARIABLES
     ### EDIT HERE with your own details
-    $cmSiteCode = "KR1"
-    $cmProviderName = "florida.interntnet.dk"
+    $cmSiteCode = "PR1"
+    $cmProviderName = "SiteServer.fqdn.com"
     $cmCollectionFolderName = "Microsoft 365 Apps"
     $cmCollectionFolder = ($cmSiteCode + ":" + "\DeviceCollection" + "\$cmCollectionFolderName")
     $limitingCollection = "All Systems"
