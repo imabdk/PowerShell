@@ -20,8 +20,18 @@
 
 #>
 
-begin {
+param(
+[parameter(Mandatory=$true, HelpMessage="Configuration Manager Site Code")]
+[ValidateNotNullOrEmpty()]
+[string]$siteCode,
 
+[parameter(Mandatory=$true, HelpMessage="Fully qualified domain name to the site server")]
+[ValidateScript({Test-Connection -ComputerName $_ -Count 1 -Quiet})]
+[ValidateNotNullOrEmpty()]
+[string]$siteServer
+)
+
+begin {
     # Create the Connect-ConfigMgr function used to connecting to the CM environment using Powershell
     function Connect-ConfigMgr() {
         # Load Configuration Manager PowerShell Module
@@ -66,11 +76,12 @@ begin {
     }
 
     ### VARIABLES
-    ### EDIT HERE with your own details
-    $cmSiteCode = "PR1"
-    $cmProviderName = "SiteServer.fqdn.com"
+    $cmSiteCode = $siteCode
+    $cmProviderName = $siteServer
     $cmCollectionFolderName = "Microsoft 365 Apps"
     $cmCollectionFolder = ($cmSiteCode + ":" + "\DeviceCollection" + "\$cmCollectionFolderName")
+    
+    # EDIT HERE
     $limitingCollection = "All Systems"
     $pilotLimitingCollection = "Software Updates - Pilots"
 
@@ -297,5 +308,5 @@ process {
 }
 
 end {
-    # nothing to see here
+    Write-Verbose -Verbose -Message "Script is done running"
 }
