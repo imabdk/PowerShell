@@ -5,19 +5,19 @@
 .DESCRIPTION
     Install RSAT features for Windows 10 1809 or 1903 or 1909 or 2004. All features are installed online from Microsoft Update thus the script requires Internet access
 
-.PARAM All
+.PARAMETER All
     Installs all the features within RSAT. This takes several minutes, depending on your Internet connection
 
-.PARAM Basic
+.PARAMETER Basic
     Installs ADDS, DHCP, DNS, GPO, ServerManager
 
-.PARAM ServerManager
+.PARAMETER ServerManager
     Installs ServerManager
 
-.PARAM Uninstall
+.PARAMETER Uninstall
     Uninstalls all the RSAT features
 
-.NOTE
+.NOTES
     Filename: Install-RSATv1809v1903v1909v2004.ps1
     Version: 1.4
     Author: Martin Bengtsson
