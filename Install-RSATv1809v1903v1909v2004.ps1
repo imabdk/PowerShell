@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Install RSAT features for Windows 10 1809 or 1903 or 1909 or 2004.
     
@@ -186,8 +186,7 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
                 try {
                     Add-WindowsCapability -Online -Name $RsatItem
                 }
-                catch [System.Exception]
-                    {
+                catch [System.Exception] {
                     Write-Log -Message -Level Warn "Failed to add $RsatItem to Windows"
                     Write-Log -Message -Level Warn $_.Exception.Message
                 }
@@ -209,8 +208,7 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
                 try {
                     Add-WindowsCapability -Online -Name $RsatItem
                 }
-                catch [System.Exception]
-                    {
+                catch [System.Exception] {
                     Write-Log -Message -Level Warn "Failed to add $RsatItem to Windows"
                     Write-Log -Message -Level Warn $_.Exception.Message
                 }
@@ -230,8 +228,7 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
             try {
                 Add-WindowsCapability -Online -Name $RsatItem
             }
-            catch [System.Exception]
-                {
+            catch [System.Exception] {
                 Write-Log -Message -Level Warn "Failed to add $RsatItem to Windows"
                 Write-Log -Message -Level Warn $_.Exception.Message
             }
@@ -255,8 +252,7 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
                 try {
                     Remove-WindowsCapability -Name $RsatItem -Online
                 }
-                catch [System.Exception]
-                    {
+                catch [System.Exception] {
                     Write-Log -Message -Level Warn "Failed to uninstall $RsatItem from Windows"
                     Write-Log -Message -Level Warn $_.Exception.Message
                 }
@@ -273,8 +269,7 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
                 try {
                     Remove-WindowsCapability -Name $RsatItem -Online
                 }
-                catch [System.Exception]
-                    {
+                catch [System.Exception] {
                     Write-Log -Message -Level Warn "Failed to remove $RsatItem from Windows"
                     Write-Log -Message -Level Warn $_.Exception.Message
                 }
@@ -287,5 +282,4 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
 }
 else {
     Write-Log -Message -Level Warn "Not running correct Windows 10 build: $WindowsBuild"
-
 }
