@@ -17,7 +17,7 @@
 .PARAM Uninstall
     Uninstalls all the RSAT features
 
-.NOTES
+.NOTE
     Filename: Install-RSATv1809v1903v1909v2004.ps1
     Version: 1.4
     Author: Martin Bengtsson
