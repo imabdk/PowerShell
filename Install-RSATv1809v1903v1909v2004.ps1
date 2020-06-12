@@ -5,16 +5,16 @@
 .DESCRIPTION
     Install RSAT features for Windows 10 1809 or 1903 or 1909 or 2004. All features are installed online from Microsoft Update thus the script requires Internet access
 
-.PARAMETER All
+.PARAM All
     Installs all the features within RSAT. This takes several minutes, depending on your Internet connection
 
-.PARAMETER Basic
+.PARAM Basic
     Installs ADDS, DHCP, DNS, GPO, ServerManager
 
-.PARAMETER ServerManager
+.PARAM ServerManager
     Installs ServerManager
 
-.PARAMETER Uninstall
+.PARAM Uninstall
     Uninstalls all the RSAT features
 
 .NOTES
@@ -187,8 +187,8 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
                     Add-WindowsCapability -Online -Name $RsatItem
                 }
                 catch [System.Exception] {
-                    Write-Log -Message -Level Warn "Failed to add $RsatItem to Windows"
-                    Write-Log -Message -Level Warn $_.Exception.Message
+                    Write-Log -Message "Failed to add $RsatItem to Windows" -Level Warn 
+                    Write-Log -Message "$_.Exception.Message" -Level Warn 
                 }
             }
         }
@@ -209,8 +209,8 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
                     Add-WindowsCapability -Online -Name $RsatItem
                 }
                 catch [System.Exception] {
-                    Write-Log -Message -Level Warn "Failed to add $RsatItem to Windows"
-                    Write-Log -Message -Level Warn $_.Exception.Message
+                    Write-Log -Message "Failed to add $RsatItem to Windows" -Level Warn 
+                    Write-Log -Message "$_.Exception.Message" -Level Warn 
                 }
             }
         }
@@ -229,8 +229,8 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
                 Add-WindowsCapability -Online -Name $RsatItem
             }
             catch [System.Exception] {
-                Write-Log -Message -Level Warn "Failed to add $RsatItem to Windows"
-                Write-Log -Message -Level Warn $_.Exception.Message
+                Write-Log -Message "Failed to add $RsatItem to Windows" -Level Warn 
+                Write-Log -Message "$_.Exception.Message" -Level Warn 
             }
          }
         
@@ -253,8 +253,8 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
                     Remove-WindowsCapability -Name $RsatItem -Online
                 }
                 catch [System.Exception] {
-                    Write-Log -Message -Level Warn "Failed to uninstall $RsatItem from Windows"
-                    Write-Log -Message -Level Warn $_.Exception.Message
+                    Write-Log -Message "Failed to uninstall $RsatItem from Windows" -Level Warn 
+                    Write-Log -Message "$_.Exception.Message" -Level Warn 
                 }
             }       
         }
@@ -270,8 +270,8 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
                     Remove-WindowsCapability -Name $RsatItem -Online
                 }
                 catch [System.Exception] {
-                    Write-Log -Message -Level Warn "Failed to remove $RsatItem from Windows"
-                    Write-Log -Message -Level Warn $_.Exception.Message
+                    Write-Log -Message "Failed to remove $RsatItem from Windows" -Level Warn 
+                    Write-Log -Message "$_.Exception.Message" -Level Warn 
                 }
             } 
         }
