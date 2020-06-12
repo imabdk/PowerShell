@@ -188,7 +188,7 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
                 }
                 catch [System.Exception] {
                     Write-Log -Message "Failed to add $RsatItem to Windows" -Level Warn 
-                    Write-Log -Message "$_.Exception.Message" -Level Warn 
+                    Write-Log -Message "$($_.Exception.Message)" -Level Warn 
                 }
             }
         }
@@ -210,7 +210,7 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
                 }
                 catch [System.Exception] {
                     Write-Log -Message "Failed to add $RsatItem to Windows" -Level Warn 
-                    Write-Log -Message "$_.Exception.Message" -Level Warn 
+                    Write-Log -Message "$($_.Exception.Message)" -Level Warn 
                 }
             }
         }
@@ -230,7 +230,7 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
             }
             catch [System.Exception] {
                 Write-Log -Message "Failed to add $RsatItem to Windows" -Level Warn 
-                Write-Log -Message "$_.Exception.Message" -Level Warn 
+                Write-Log -Message "$($_.Exception.Message)" -Level Warn 
             }
          }
         
@@ -254,7 +254,7 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
                 }
                 catch [System.Exception] {
                     Write-Log -Message "Failed to uninstall $RsatItem from Windows" -Level Warn 
-                    Write-Log -Message "$_.Exception.Message" -Level Warn 
+                    Write-Log -Message "$($_.Exception.Message)" -Level Warn 
                 }
             }       
         }
@@ -271,7 +271,7 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
                 }
                 catch [System.Exception] {
                     Write-Log -Message "Failed to remove $RsatItem from Windows" -Level Warn 
-                    Write-Log -Message "$_.Exception.Message" -Level Warn 
+                    Write-Log -Message "$($_.Exception.Message)" -Level Warn 
                 }
             } 
         }
@@ -281,5 +281,5 @@ if (($WindowsBuild -eq $1809Build) -OR ($WindowsBuild -eq $1903Build) -OR ($Wind
     }
 }
 else {
-    Write-Log -Message -Level Warn "Not running correct Windows 10 build: $WindowsBuild"
+    Write-Log -Message "Not running correct Windows 10 build: $WindowsBuild" -Level Warn
 }
