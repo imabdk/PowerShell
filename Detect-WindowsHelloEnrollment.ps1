@@ -16,6 +16,7 @@
     Twitter: @mwbengtsson
 
 .LINK
+    https://www.imab.dk/endpoint-analytics-find-devices-not-enrolled-with-windows-hello-for-business/
     
 #> 
 
