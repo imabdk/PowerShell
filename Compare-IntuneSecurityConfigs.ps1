@@ -13,7 +13,7 @@
     Twitter: @mwbengtsson
 
 .LINK
-    
+    https://www.imab.dk/comparing-security-baselines-in-endpoint-manager-using-powershell-and-microsoft-graph/    
 #> 
 
 $originalProfileName = "Security Baseline - Windows 10 1903"
