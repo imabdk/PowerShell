@@ -18,10 +18,10 @@
     Uninstalls all the RSAT features
 
 .PARAMETER disableWSUS
-    Disables the use of WSUS prior to installing the RSAT features. This involves restarting the wuauserv service. The script will enable WSUS again post installing the
+    Disables the use of WSUS prior to installing the RSAT features. This involves restarting the wuauserv service. The script will enable WSUS again post installing the features on demand
 
 .NOTES
-    Filename: Install-RSATv1809v1903v1909v2004.ps1
+    Filename: Install-RSATv1809v1903v1909v2004v20H2.ps1
     Version: 1.6
     Author: Martin Bengtsson
     Blog: www.imab.dk
