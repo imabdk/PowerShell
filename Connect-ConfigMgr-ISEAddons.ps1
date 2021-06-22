@@ -11,8 +11,8 @@ function Connect-ConfigMgr {
     #Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 
     # Site configuration
-    $SiteCode = "KR1" # Site code 
-    $ProviderMachineName = "florida.interntnet.dk" # SMS Provider machine name
+    $SiteCode = "SiteCode" # Site code 
+    $ProviderMachineName = "SiteServer.fqdn.com" # SMS Provider machine name
 
     # Customizations
     $initParams = @{}
