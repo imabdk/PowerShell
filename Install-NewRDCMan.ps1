@@ -10,7 +10,7 @@
         Uninstalls (deletes) the entire directory
  
 .NOTES
-    FileName:    Install-NewRDCMan.ps1
+    FileName: Install-NewRDCMan.ps1
     Author: Martin Bengtsson
     Blog: www.imab.dk
     Twitter: @mwbengtsson
