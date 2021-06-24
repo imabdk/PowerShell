@@ -11,7 +11,9 @@
  
 .NOTES
     FileName:    Install-NewRDCMan.ps1
-    Author:      Martin Bengtsson
+    Author: Martin Bengtsson
+    Blog: www.imab.dk
+    Twitter: @mwbengtsson
 #>
 
 [CmdletBinding()]
