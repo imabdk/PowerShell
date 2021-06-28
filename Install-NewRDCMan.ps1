@@ -24,7 +24,7 @@ param(
     [parameter(Mandatory=$false)]
     [ValidateNotNullOrEmpty()]
     [switch]$Uninstall
- )
+)
 
 function Uninstall-OldRDCMan() {
     $registryPath = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
@@ -49,7 +49,6 @@ function Uninstall-OldRDCMan() {
                                 Start-Process "C:\Windows\System32\msiexec.exe" -ArgumentList ("/x" + $productCode + " /passive") -Wait
                                 Write-Verbose -Verbose -Message "Successfully uninstalled application: $($app.DisplayName) version: $($app.DisplayVersion)"
                             }
-
                             catch {
                                 Write-Error -Message "Failed to uninstall application: $($app.DisplayName)"
                             }
@@ -75,7 +74,7 @@ function Install-NewRDCMan() {
         }
         try {
             Invoke-WebRequest -Uri $rdcManSource -OutFile $rdcManFile
-            Write-Verbose -Verbose -Message "Succesfully installed NEW Remote Desktop Connection Manager from $rdcManSource"
+            Write-Verbose -Verbose -Message "Succesfully installed NEW Remote Desktop Connection Manager from $rdcManSource to $rdcManFile"
         }
         catch {
             Write-Verbose -Verbose -Message "Failed to download RDCman.exe from $rdcManSource"            
