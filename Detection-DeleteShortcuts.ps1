@@ -77,9 +77,7 @@ try {
     $allUsersDesktop = [Environment]::GetFolderPath("CommonDesktopDirectory")
     $userRegistryPath = "Registry::HKEY_USERS\$($currentUserSID)\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders"
     $currentUserDesktop = Get-CurrentUserDesktop $userRegistryPath
-    #endregion
 
-    #region Find shortcuts
     if (Test-Path -Path $allUsersDesktop) {
         foreach ($ShortcutName in $shortCutNames) {
            $shortCutsFound += Get-ChildItem -Path $allUsersDesktop -Filter *.lnk | Where-Object {$_.Name -like $shortCutName}
