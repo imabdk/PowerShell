@@ -2,7 +2,6 @@
 .SYNOPSIS
     Load and run the LSUClient PowerShell module. Used for installing Lenovo BIOS and Drivers during OSD with Configuration Manager
    
-    
 .DESCRIPTION
     Same as above
 
@@ -54,6 +53,7 @@ function Load-LSUClientModule() {
         Write-Verbose -Verbose "LSUClient module already imported and loaded."
     }
 }
+#Function for locating and installing all drivers and BIOS which can be installed silent and unattended
 function Run-LSUClientModuleDefault() {
     $regKey = $global:regKey
     if (-NOT(Test-Path -Path $regKey)) { New-Item -Path $regKey -Force | Out-Null }
