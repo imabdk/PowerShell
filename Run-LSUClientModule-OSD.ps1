@@ -1,4 +1,24 @@
-﻿$companyName = "imab.dk"
+﻿<#
+.SYNOPSIS
+    Load and run the LSUClient PowerShell module. Used for installing Lenovo BIOS and Drivers during OSD with Configuration Manager
+   
+    
+.DESCRIPTION
+    Same as above
+
+.NOTES
+    Filename: Run-LSUClientModule-OSD.ps1
+    Version: 1.0
+    Author: Martin Bengtsson
+    Blog: www.imab.dk
+    Twitter: @mwbengtsson
+
+.LINK
+    https://www.imab.dk/install-lenovo-drivers-and-bios-directly-from-lenovos-driver-catalog-during-osd-using-configuration-manager/
+    
+#> 
+
+$companyName = "imab.dk"
 $global:regKey = "HKLM:\SOFTWARE\$companyName\OSDDrivers"
 function Get-LenovoComputerModel() {
     $lenovoVendor = (Get-CimInstance -ClassName Win32_ComputerSystemProduct).Vendor
@@ -43,8 +63,8 @@ function Run-LSUClientModuleDefault() {
         New-ItemProperty -Path $regKey -Name $update.ID -Value $update.Title -Force | Out-Null
     }
 }
-#No Intel Graphics Driver
-#Some weird shit going on with the package here on certain models, making the script run forever
+#Exclude Intel Graphics Driver
+#Some weird shit going on with the package here on certain models, making the script run forever, thus exlcuding the driver
 function Run-LSUClientModuleCustom() {
     $regKey = $global:regKey
     if (-NOT(Test-Path -Path $regKey)) { New-Item -Path $regKey -Force | Out-Null }
