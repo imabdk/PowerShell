@@ -17,7 +17,7 @@
 #> 
 $imControllerPath = "$env:windir\Lenovo\ImController\PluginHost\Lenovo.Modern.ImController.PluginHost.exe"
 $imCOntrollerServiceName = "ImControllerService"
-$imCOntrollerService = Get-Service -Name $imCOntrollerServiceName
+$imCOntrollerService = Get-Service -Name $imCOntrollerServiceName -ErrorAction SilentlyContinue
 $checkVersion = "1.1.20.3"
 if (-NOT[string]::IsNullOrEmpty($imCOntrollerService)) {
     if (Test-Path -Path $imControllerPath) {

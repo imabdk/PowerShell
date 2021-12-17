@@ -14,11 +14,11 @@
     Twitter: @mwbengtsson
 
 .LINK
-    
+  
 #> 
 
 $imCOntrollerServiceName = "ImControllerService"
-$imCOntrollerService = Get-Service -Name $imCOntrollerServiceName
+$imCOntrollerService = Get-Service -Name $imCOntrollerServiceName -ErrorAction SilentlyContinue
 if (-NOT[string]::IsNullOrEmpty($imCOntrollerService)) {
     try { 
         Restart-Service -Name $imCOntrollerServiceName
