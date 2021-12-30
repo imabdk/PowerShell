@@ -17,34 +17,47 @@
 #>
 
 param(
-	[Parameter(Mandatory=$false)]
+	[Parameter(Mandatory=$true)]
 	[string]$primDNS,
-	[Parameter(Mandatory=$false)]
+	[Parameter(Mandatory=$true)]
 	[string]$secDNS,
 	[Parameter(Mandatory=$false)]
     [string]$addressFam = "IPv4"
 )
 begin {
     function Get-InterfaceIndex() {
-        $netAdaptUp = Get-NetAdapter | Where-Object {$_.Status -eq "Up"}
+        # Finding net adapters which is Up and ConnectorPresent is TRUE 
+        $netAdaptUp = Get-NetAdapter | Where-Object {$_.Status -eq "Up" -AND $_.ConnectorPresent -eq $True}
         if (-NOT[string]::IsNullOrEmpty($netAdaptUp)) {
             Write-Output $netAdaptUp.ifIndex
             Write-Output $netAdaptUp.InterfaceDescription
         }
     }
     function Change-DNSServers($fIfIndex,$fAddressFam,$fPrimDNS,$fSecDNS) {
-        $currentDNS = Get-DnsClientServerAddress -AddressFamily $fAddressFam -InterfaceIndex $fIfIndex | Where-Object {$_.ServerAddresses -notcontains $fPrimDNS}
-        if (-NOT[string]::IsNullOrEmpty($currentDNS)) {
+        # Setting the primDNS and secDNS to 0 will result in a reset to default DNS server addresses
+        if (($primDNS -eq 0) -OR ($secDNS -eq 0)) {
+            Write-Verbose -Verbose -Message "priDNS and secDNS is null. Resetting DNS server addresses to default on $global:ifDescription"
             try {
-                Set-DnsClientServerAddress -InterfaceIndex $fIfIndex -ServerAddresses ("$fPrimDNS","$fSecDNS")
-                Write-Verbose -Verbose -Message "successfully changed the DNS servers on $global:ifDescription to primDNS: $primDNS and secDNS: $secDNS"
+                Set-DnsClientServerAddress -InterfaceIndex $fIfIndex -ResetServerAddresses            
             }
             catch {
-                Write-Verbose -Verbose -Message "Failed to change the DNS servers on $global:ifDescription"
+                Write-Verbose -Verbose -Message "Failed to run -ResetServerAddresses"
             }
         }
         else {
-            Write-Verbose -Verbose -Message "No changes to DNS on $global:ifDescription required. Doing nothing."
+            $currentDNS = Get-DnsClientServerAddress -AddressFamily $fAddressFam -InterfaceIndex $fIfIndex | Where-Object {$_.ServerAddresses -notcontains $fPrimDNS}
+            if (-NOT[string]::IsNullOrEmpty($currentDNS)) {
+                try {
+                    Set-DnsClientServerAddress -InterfaceIndex $fIfIndex -ServerAddresses ("$fPrimDNS","$fSecDNS")
+                    Write-Verbose -Verbose -Message "successfully changed the DNS servers on $global:ifDescription to primDNS: $primDNS and secDNS: $secDNS"
+                }
+                catch {
+                    Write-Verbose -Verbose -Message "Failed to change the DNS servers on $global:ifDescription"
+                }
+            }
+            else {
+                Write-Verbose -Verbose -Message "No changes to DNS on $global:ifDescription required. Doing nothing."
+            }
         }
     }
 }
