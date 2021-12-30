@@ -13,15 +13,15 @@
     Twitter: @mwbengtsson
 
 .LINK
-    
+    https://www.imab.dk/set-primary-and-secondary-dns-server-addresses-using-configmgr-and-powershell/    
 #>
 
 param(
-	[Parameter(Mandatory=$true)]
-	[string]$primDNS,
-	[Parameter(Mandatory=$true)]
-	[string]$secDNS,
-	[Parameter(Mandatory=$false)]
+    [Parameter(Mandatory=$true)]
+    [string]$primDNS,
+    [Parameter(Mandatory=$true)]
+    [string]$secDNS,
+    [Parameter(Mandatory=$false)]
     [string]$addressFam = "IPv4"
 )
 begin {
