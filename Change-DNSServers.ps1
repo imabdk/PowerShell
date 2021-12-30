@@ -6,7 +6,7 @@
     Same as above
 
 .NOTES
-    Filename: 
+    Filename: Change-DNSServers.ps1
     Version: 1.0
     Author: Martin Bengtsson
     Blog: www.imab.dk
@@ -14,12 +14,17 @@
 
 .LINK
     
-#> 
-begin {
-    $global:primDNS = "8.8.8.8"
-    $global:secDNS = "8.8.4.4"
-    $global:addressFam = "IPv4"
+#>
 
+param(
+	[Parameter(Mandatory=$false)]
+	[string]$primDNS,
+	[Parameter(Mandatory=$false)]
+	[string]$secDNS,
+	[Parameter(Mandatory=$false)]
+    [string]$addressFam = "IPv4"
+)
+begin {
     function Get-InterfaceIndex() {
         $netAdaptUp = Get-NetAdapter | Where-Object {$_.Status -eq "Up"}
         if (-NOT[string]::IsNullOrEmpty($netAdaptUp)) {
@@ -27,13 +32,12 @@ begin {
             Write-Output $netAdaptUp.InterfaceDescription
         }
     }
-
     function Change-DNSServers($fIfIndex,$fAddressFam,$fPrimDNS,$fSecDNS) {
         $currentDNS = Get-DnsClientServerAddress -AddressFamily $fAddressFam -InterfaceIndex $fIfIndex | Where-Object {$_.ServerAddresses -notcontains $fPrimDNS}
         if (-NOT[string]::IsNullOrEmpty($currentDNS)) {
             try {
                 Set-DnsClientServerAddress -InterfaceIndex $fIfIndex -ServerAddresses ("$fPrimDNS","$fSecDNS")
-                Write-Verbose -Verbose -Message "successfully changed the DNS servers on $global:ifDescription"
+                Write-Verbose -Verbose -Message "successfully changed the DNS servers on $global:ifDescription to primDNS: $primDNS and secDNS: $secDNS"
             }
             catch {
                 Write-Verbose -Verbose -Message "Failed to change the DNS servers on $global:ifDescription"
@@ -47,7 +51,7 @@ begin {
 process {
     $ifIndex = (Get-InterfaceIndex)[0]
     $global:ifDescription = (Get-InterfaceIndex)[1]
-    Change-DNSServers -fIfIndex $ifIndex -fAddressFam $global:addressFam -fPrimDNS $global:primDNS -fSecDNS $global:secDNS
+    Change-DNSServers -fIfIndex $ifIndex -fAddressFam $addressFam -fPrimDNS $primDNS -fSecDNS $secDNS
 }
 end { 
     #Nothing to see here
