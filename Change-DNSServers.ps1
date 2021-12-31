@@ -1,6 +1,7 @@
 ﻿<#
 .SYNOPSIS
-    Set or change configured DNS servers. Something I created as I needed to change DNS servers on a large scale of servers.
+    Set or change configured DNS server addresses. Something I created as I needed to change DNS servers on a large scale of servers.
+    Intended to be used with ConfigMgr for automation purposes.
    
 .DESCRIPTION
     Same as above
