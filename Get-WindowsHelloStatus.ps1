@@ -57,6 +57,7 @@ function Get-WindowsHelloStatus() {
         Exit 1
     }
 }
+# Return Windows Hello status to Intune in JSON format
 $WHfB = Get-WindowsHelloStatus
 $hash = @{EnrollmentStatus = $WHfB}
 return $hash | ConvertTo-Json -Compress
