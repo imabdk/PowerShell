@@ -1,5 +1,4 @@
 ﻿<#
-<#
 .SYNOPSIS
     This scripts configures the relevant VPN profile, and sets the versioning in registry
    
@@ -200,22 +199,22 @@ function Configure-VPNProfile() {
                 Write-Output "VPN profile is already present in rasphone.pbk file: $rasphoneFile. In this case, replacing the entire rasphone.pbk file"
                 try {
                     $global:VPNProfile | Out-File -FilePath $rasphoneFile -Encoding ascii -Force
-                    $rasphoneFileStatus = $true
+                    $global:rasphoneFileStatus = $true
                 }
                 catch {
                     Write-Output "Could not create new rasphone file: $rasphoneFile"
-                    $rasphoneFileStatus = $false
+                    $global:rasphoneFileStatus = $false
                 }
             }
             else {
                 Write-Output "VPN profile was not found in rasphone.pbk file: $rasphoneFile. In this case, adding VPN profile to existing rasphone.pbk file"
                 try {
                     Add-Content -Path $rasphoneFile -Value $global:VPNProfile
-                    $rasphoneFileStatus = $true
+                    $global:rasphoneFileStatus = $true
                 }
                 catch {
                     Write-Output "Could not add-content to rasphone file: $rasphoneFile"
-                    $rasphoneFileStatus = $false
+                    $global:rasphoneFileStatus = $false
                 }
             }
         }
@@ -224,11 +223,11 @@ function Configure-VPNProfile() {
         Write-Output "rasphone.pbk file not found: $rasphoneFile. Creating new file from scratch"
         try {
             $global:VPNProfile | Out-File -FilePath $rasphoneFile -Encoding ascii -Force
-            $rasphoneFileStatus = $true
+            $global:rasphoneFileStatus = $true
         }
         catch {
             Write-Output "Could not create new rasphone file: $rasphoneFile"
-            $rasphoneFileStatus = $false
+            $global:rasphoneFileStatus = $false
         }
     }
 }
@@ -261,11 +260,11 @@ catch {
     exit 1
 }
 finally { 
-    if ($rasphoneFileStatus -eq $true) {
+    if ($global:rasphoneFileStatus -eq $true) {
         Write-Output "rasphoneFileStatus equals True. Exiting with 0"
         exit 0
     }
-    elseif ($rasphoneFileStatus -eq $false) {
+    elseif ($global:rasphoneFileStatus -eq $false) {
         Write-Output "rasphoneFileStatus equals False. Exiting with 1"
         exit 1
     }
