@@ -19,6 +19,7 @@
 
 .LINK
     https://www.imab.dk/remove-built-in-teams-app-and-chat-icon-in-windows-11-during-a-feature-update-via-setupconfig-ini-and-setupcomplete-cmd
+    https://www.imab.dk/monitor-your-windows-11-feature-updates-with-custom-action-scripts-and-notifications-send-to-microsoft-teams/
 #>
 # Global variables
 $global:iniFileFolderPath = "$env:SystemDrive\Users\Default\AppData\Local\Microsoft\Windows\WSUS"
