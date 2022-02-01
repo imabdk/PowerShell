@@ -12,7 +12,7 @@
 
 .NOTES
     Filename: FU-Script.ps1
-    Version: 1.0
+    Version: 2.0
     Author: Martin Bengtsson
     Blog: www.imab.dk
     Twitter: @mwbengtsson
