@@ -1,6 +1,9 @@
 ﻿<#
 .SYNOPSIS
-    This script will configure all the specific registry keys within the configured path, to the set the value
+    This script will configure all the specific registry keys within the configured path, to the set value
+    
+    This is currently tailored directly towards replacing the GPO: MSFT Microsoft 365 Apps v2206 - Legacy JScript Block - Computer
+    With a few adjustments, this can be used to configure any registry key and value
 
 .DESCRIPTION
     Same as above
@@ -190,7 +193,6 @@ $registryNames = @(
 #region Execution
 try {
     # Looping through each registry value- This means all registry keys are being configured to the set value
-    # I'm choosing to hardcode the value
     foreach ($name in $registryNames) {
         Set-RegistryKeyValue -registryPath $registryPath -registryName $name -DWord 69632
     }
