@@ -25,13 +25,11 @@ function Test-RegistryKeyValue() {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [string]
         # The path to the registry key where the value should exist
-        $registryPath,
+        [string]$registryPath,
         [Parameter(Mandatory=$true)]
-        [string]
         # The name of the registry key
-        $registryName
+        [string]$registryName
     )
     if (-NOT(Test-Path -Path $registryPath -PathType Container)) {
         return $false
@@ -53,13 +51,11 @@ function Get-RegistryKeyValue() {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [string]
         # The path to the registry key where the value should exist
-        $registryPath,
+        [string]$registryPath,
         [Parameter(Mandatory=$true)]
-        [string]
         # The name of the registry
-        $registryName
+        [string]$registryName
     )
     if (-NOT(Test-RegistryKeyValue -registryPath $registryPath -registryName $registryName)) {
         return $null

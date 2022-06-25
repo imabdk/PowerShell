@@ -24,13 +24,11 @@ function Test-RegistryKeyValue() {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [string]
         # The path to the registry key where the value should exist
-        $registryPath,
+        [string]$registryPath,
         [Parameter(Mandatory=$true)]
-        [string]
         # The name of the registry key
-        $registryName
+        [string]$registryName
     )
     if (-NOT(Test-Path -Path $registryPath -PathType Container)) {
         return $false
@@ -52,13 +50,11 @@ function Remove-RegistryKeyValue() {
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
-        [string]
         # The path to the registry key where the value should be removed
-        $registryPath,        
+        [string]$registryPath,        
         [Parameter(Mandatory=$true)]
-        [string]
         # The name of the value to remove
-        $registryName
+        [string]$registryName
     )
     if ((Test-RegistryKeyValue -Path $registryPath -Name $registryName)) {
         if ($pscmdlet.ShouldProcess(('Item: {0} Property: {1}' -f $registryPath,$registryName),'Remove Property')) {
@@ -71,9 +67,8 @@ function Install-RegistryKey() {
     [CmdletBinding(SupportsShouldPRocess=$true)]
     param(
         [Parameter(Mandatory=$true)]
-        [string]
         # The path to the registry key to create
-        $registryPath
+        [string]$registryPath
     )
     if (-NOT(Test-Path -Path $registryPath -PathType Container)) {
         New-Item -Path $registryPath -ItemType RegistryKey -Force | Out-String | Write-Verbose
@@ -84,50 +79,39 @@ function Set-RegistryKeyValue() {
     [CmdletBinding(SupportsShouldPRocess=$true,DefaultParameterSetName='String')]
     param(
         [Parameter(Mandatory=$true)]
-        [string]
         # The path to the registry key where the value should be set. Will be created if it doesn't exist.
-        $registryPath,
+        [string]$registryPath,
         [Parameter(Mandatory=$true)]
-        [string]
         # The name of the value being set.
-        $registryName,
+        [string]$registryName,
         [Parameter(Mandatory=$true,ParameterSetName='String')]
         [AllowEmptyString()]
         [AllowNull()]
-        [string]
         # The value's data. Creates a value for holding string data (i.e. `REG_SZ`). If `$null`, the value will be saved as an empty string.
-        $String,
+        [string]$String,
         [Parameter(ParameterSetName='String')]
-        [Switch]
         # The string should be expanded when retrieved. Creates a value for holding expanded string data (i.e. `REG_EXPAND_SZ`).
-        $Expand,
+        [Switch]$Expand,
         [Parameter(Mandatory=$true,ParameterSetName='Binary')]
-        [byte[]]
         # The value's data. Creates a value for holding binary data (i.e. `REG_BINARY`).
-        $Binary,
+        [byte[]]$Binary,
         [Parameter(Mandatory=$true,ParameterSetName='DWord')]
-        [int]
         # The value's data. Creates a value for holding a 32-bit integer (i.e. `REG_DWORD`).
-        $DWord,
+        [int]$DWord,
         [Parameter(Mandatory=$true,ParameterSetName='DWordAsUnsignedInt')]
-        [uint32]
         # The value's data as an unsigned integer (i.e. `UInt32`). Creates a value for holding a 32-bit integer (i.e. `REG_DWORD`).
-        $UDWord,
+        [uint32]$UDWord,
         [Parameter(Mandatory=$true,ParameterSetName='QWord')]
-        [long]
         # The value's data. Creates a value for holding a 64-bit integer (i.e. `REG_QWORD`).
-        $QWord,
+        [long]$QWord,
         [Parameter(Mandatory=$true,ParameterSetName='QWordAsUnsignedInt')]
-        [uint64]
         # The value's data as an unsigned long (i.e. `UInt64`). Creates a value for holding a 64-bit integer (i.e. `REG_QWORD`).
-        $UQWord,
+        [uint64]$UQWord,
         [Parameter(Mandatory=$true,ParameterSetName='MultiString')]
-        [string[]]
         # The value's data. Creates a value for holding an array of strings (i.e. `REG_MULTI_SZ`).
-        $Strings,
-        [Switch]
+        [string[]]$Strings,
         # Removes and re-creates the value. Useful for changing a value's type.
-        $Force
+        [Switch]$Force
     )
 
     $value = $null
