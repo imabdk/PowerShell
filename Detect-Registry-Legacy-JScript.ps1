@@ -3,6 +3,10 @@
     This script will detect if one or more specific registry keys within the same path is configured with the set value.
     Script will exit with exit code 1 or 0, depending on mismatch or not, instructing Intune to potentially run the remediation script
    
+
+    This is currently tailored directly towards replacing the GPO: MSFT Microsoft 365 Apps v2206 - Legacy JScript Block - Computer
+    With a few adjustments, this can be used to configure any registry key and value
+
 .DESCRIPTION
     Same as above
 
