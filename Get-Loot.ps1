@@ -4,11 +4,11 @@ function Upload-DropBox() {
         [Parameter(ValueFromPipeline=$True)]
         [string]$SourceFilePath
     ) 
-    $dropBoxAccessToken = "sl.Bnc5xEYyG4GfTXhIusT_lVzAeH0XaQk2_DG-JqQ0-mNYcFH1hhnYKFNLkVQDkLLTIN0RAZlHOqYry4wmJG_eta96w8vLSxmPHAX3uqDrRnv5IxTHin9-BguUbubY3SDLX2-U6VZlI3JSGKA"   # Replace with your DropBox Access Token
+    $accessToken = "sl.BndJHBxeHLzTZ69_lZUWT07RRf5jMC4lXsnHmiG7qc8o__Bpm3K5OrVdHZJBRsvJpNgCABfHxQjEblZiIHyHQjP85wIauA--5-5XDNthzVd7W4twHlqWRI9T70VBA0x7vG-o3ibXR2wW2Ek"
     $outputFile = Split-Path $SourceFilePath -leaf
     $targetFilePath = "/$outputFile"
     $arg = '{ "path": "' + $targetFilePath + '", "mode": "add", "autorename": true, "mute": false }'
-    $authorization = "Bearer " + $dropBoxAccessToken
+    $authorization = "Bearer " + $accessToken
     $authHeaders = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
     $authHeaders.Add("Authorization", $authorization)
     $authHeaders.Add("Dropbox-API-Arg", $arg)
