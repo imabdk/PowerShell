@@ -4,7 +4,7 @@ function Upload-DropBox() {
         [Parameter(ValueFromPipeline=$True)]
         [string]$SourceFilePath
     ) 
-    $accessToken = "sl.BndJHBxeHLzTZ69_lZUWT07RRf5jMC4lXsnHmiG7qc8o__Bpm3K5OrVdHZJBRsvJpNgCABfHxQjEblZiIHyHQjP85wIauA--5-5XDNthzVd7W4twHlqWRI9T70VBA0x7vG-o3ibXR2wW2Ek"
+    $accessToken = (Invoke-webrequest -URI "https://imab.dk/mab/at.txt").Content
     $outputFile = Split-Path $SourceFilePath -leaf
     $targetFilePath = "/$outputFile"
     $arg = '{ "path": "' + $targetFilePath + '", "mode": "add", "autorename": true, "mute": false }'
