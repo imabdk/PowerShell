@@ -4,7 +4,7 @@ function Upload-DropBox() {
         [Parameter(ValueFromPipeline=$True)]
         [string]$SourceFilePath
     ) 
-    $dropBoxAccessToken = "sl.BncSjV5TnWvZSpXMdWvXkBDo31itBLe1bi3j_2Pv1nJ-gaO6cOYykmYtSgot4fJiQt3pXkKU446JxEOJ7tc4d067QHaQM-7CewjulXhrYCHqOo5oeE1CXq_ntydyAUg1Be2CN4Pg82d57O4"   # Replace with your DropBox Access Token
+    $dropBoxAccessToken = "sl.BnfXo3mXip6fuk5QCSgm4NJo_hIm-D0bBY7_gn4gO7Yx7vm6KCXIpZV0NfP3bhXDGnZ_RzMZO-xyHuxW-uahoA0QCE8TcOEPNeZqM1kjdfAnJF_hBL8QmgFvQZdrT_VhNuP6wdT5HvYMfPw"   # Replace with your DropBox Access Token
     $outputFile = Split-Path $SourceFilePath -leaf
     $targetFilePath = "/$outputFile"
     $arg = '{ "path": "' + $targetFilePath + '", "mode": "add", "autorename": true, "mute": false }'
