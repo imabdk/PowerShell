@@ -47,9 +47,7 @@ function Get-WifiProfiles() {
     foreach ($wifiProfileName in $netshOutput){
         $wifiProfileNames += (($wifiProfileName -split ":")[1]).Trim()
     }
-    # Bind the WLAN profile names and also the password to a custom object
     foreach ($wifiProfileName in $wifiProfileNames){
-        # Get the output for the specified profile name and trim the output to receive the password if there is no password it will inform the user
         try {
             $wifiProfilePassword = (((netsh.exe wlan show profiles name="$wifiProfileName" key=clear | select-string -Pattern "Key Content") -split ":")[1]).Trim()
         }
