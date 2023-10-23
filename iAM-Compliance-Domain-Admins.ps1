@@ -30,6 +30,7 @@ elseif (-NOT(Get-Module -Name ActiveDirectory -ListAvailable)) {
 }
 # Create functions
 # This function gets the content of the allocated extensionattribute
+# This is currently not specific about which extensionattribute are being used. You decide that. :-)
 function Get-iAMRole() {
     [CmdletBinding()]
     param (
@@ -38,11 +39,11 @@ function Get-iAMRole() {
     $iAMResult = 
     try {
         # Getting user object
-        (Get-ADUser -Identity $SamAccountName -Properties extensionAttribute2 -ErrorAction SilentlyContinue | Select-Object extensionAttribute2).extensionAttribute2
+        (Get-ADUser -Identity $SamAccountName -Properties extensionAttribute -ErrorAction SilentlyContinue | Select-Object extensionAttribute).extensionAttribute
     } 
     catch {
         # Otherwise assuming computer object
-        (Get-ADComputer -Identity $SamAccountName -Properties extensionAttribute2 -ErrorAction SilentlyContinue | Select-Object extensionAttribute2).extensionAttribute2
+        (Get-ADComputer -Identity $SamAccountName -Properties extensionAttribute -ErrorAction SilentlyContinue | Select-Object extensionAttribute).extensionAttribute
     }
     # This dictates that the iAM roles are separated with ";" on the extensionattribute in AD
     if (-NOT[string]::IsNullOrEmpty($iAMResult)) {
