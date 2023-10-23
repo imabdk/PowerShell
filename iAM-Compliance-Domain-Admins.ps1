@@ -30,7 +30,7 @@ elseif (-NOT(Get-Module -Name ActiveDirectory -ListAvailable)) {
 }
 # Create functions
 # This function gets the content of the allocated extensionattribute
-# This is currently not specific about which extensionattribute are being used. You decide that. :-)
+# This is currently not specific about which extensionattribute are being used. You decide that by using any of the 15 attributes available in AD
 function Get-iAMRole() {
     [CmdletBinding()]
     param (
@@ -39,11 +39,11 @@ function Get-iAMRole() {
     $iAMResult = 
     try {
         # Getting user object
-        (Get-ADUser -Identity $SamAccountName -Properties extensionAttribute -ErrorAction SilentlyContinue | Select-Object extensionAttribute).extensionAttribute
+        (Get-ADUser -Identity $SamAccountName -Properties extensionAttributeXX -ErrorAction SilentlyContinue | Select-Object extensionAttributeXX).extensionAttributeXX
     } 
     catch {
         # Otherwise assuming computer object
-        (Get-ADComputer -Identity $SamAccountName -Properties extensionAttribute -ErrorAction SilentlyContinue | Select-Object extensionAttribute).extensionAttribute
+        (Get-ADComputer -Identity $SamAccountName -Properties extensionAttributeXX -ErrorAction SilentlyContinue | Select-Object extensionAttributeXX).extensionAttributeXX
     }
     # This dictates that the iAM roles are separated with ";" on the extensionattribute in AD
     if (-NOT[string]::IsNullOrEmpty($iAMResult)) {
@@ -61,7 +61,7 @@ function Get-UsersWithiAMRole() {
         [string]$iAMRole,
         [string]$OU
     )
-    $getUsers = (Get-ADUser -SearchBase $OU -SearchScope Subtree -Filter "extensionattribute2 -like '*$($iAMRole)*'" -Properties extensionAttribute2 | Select-Object SamAccountName).SamAccountName
+    $getUsers = (Get-ADUser -SearchBase $OU -SearchScope Subtree -Filter "extensionattributeXX -like '*$($iAMRole)*'" -Properties extensionAttributeXX | Select-Object SamAccountName).SamAccountName
     Write-Output $getUsers
 }
 # Variables
