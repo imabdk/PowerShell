@@ -55,6 +55,7 @@ function Get-iAMRole() {
     }
 }
 # This function queries AD within the specified OU with a filter for users with the specified iAM role
+# This is currently not specific about which extensionattribute are being used. You decide that by using any of the 15 attributes available in AD
 function Get-UsersWithiAMRole() {
     [CmdletBinding()]
     param (
