@@ -39,7 +39,7 @@ function Uninstall-ApplicationLocalMachine() {
                             try {
                                 Write-Verbose -Verbose -Message "Uninstalling application: $($App.DisplayName)"
                                 #Start-Process "C:\Windows\System32\msiexec.exe" -ArgumentList ("/x" + $productCode + " /passive") -Wait
-                                Start-Process 'cmd.exe' -ArgumentList ("/c" + $($App.UninstallString) + " /quiet" + " /noreboot")
+                                Start-Process 'cmd.exe' -ArgumentList ("/c" + $($App.UninstallString) + " /quiet" + " /norestart")
                             } catch {
                                 Write-Error -Message "Failed to uninstall application: $($App.DisplayName)"
                             }
