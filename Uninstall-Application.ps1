@@ -60,7 +60,7 @@ function Uninstall-ApplicationLocalMachine() {
                             }
                         }
                         else {
-                            # If script reaches this point, the application is installed with an unsupported installer
+                            # If script reaches this point, the application is installed with an unsupported installer. Feel free to add further mechanisms.
                         }
                     }
                 }
