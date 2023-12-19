@@ -10,7 +10,7 @@
     
 .NOTES
     Filename: Uninstall-Application.ps1
-    Version: 2.0
+    Version: 3.0
     Author: Martin Bengtsson
     Blog: www.imab.dk
     Twitter: @mwbengtsson
@@ -20,6 +20,7 @@
     1.0   -   Script created
     2.0   -   Realized not all applications are properly registered in Windows installer to use msiexec.exe /x as the UninstallString
               Some applications are registered with msiexec.exe /i, which requires a slight change in the script below
+    3.0   -   Added support to pass multiple displaynames (applications) to the script: .\Uninstall-Application.ps1 -displayName "Application1","Application2"   
 
 .LINK
     https://www.imab.dk/uninstall-any-application-in-a-jiffy-using-powershell-and-configuration-manager
@@ -28,49 +29,51 @@
 [cmdletbinding()]
 param(
     [Parameter(Mandatory=$true)]
-    [string]$displayName
+    [string[]]$displayName
 )
 function Uninstall-ApplicationLocalMachine() {
-    Write-Verbose -Verbose -Message "Running Uninstall-ApplicationLocalMachine function"
-    Write-Verbose -Verbose -Message "Looking for installed application: $displayName"
-    $registryPaths = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall","HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
-    foreach ($path in $registryPaths) {
-        Write-Verbose -Verbose -Message "Looping through $path"
-        if (Test-Path -Path $path) {
-            $installedApps = Get-ChildItem -Path $path -Recurse | Get-ItemProperty | Where-Object {$_.DisplayName -like "*$displayName*" } | Select-Object Displayname,UninstallString,PSChildName
-            if ($installedApps) {
-                Write-Verbose -Verbose -Message "Installed applications matching '$displayName' found in $path"
-                foreach ($App in $installedApps) {
-                    if ($App.UninstallString) {
-                        if ($App.UninstallString.Contains("MsiExec.exe")) {
-                            try {
-                                Write-Verbose -Verbose -Message "Uninstalling application: $($App.DisplayName) via $($App.UninstallString)"
-                                Start-Process 'cmd.exe' -ArgumentList ("/c" + "MsiExec.exe /x" + $($App.PSChildName) + " /quiet" + " /norestart") -Wait
-                                
-                            } catch {
-                                Write-Error -Message "Failed to uninstall application: $($App.DisplayName)"
+    foreach ($object in $displayName) {
+        Write-Verbose -Verbose -Message "Running Uninstall-ApplicationLocalMachine function"
+        Write-Verbose -Verbose -Message "Looking for installed application: $object"
+        $registryPaths = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall","HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+        foreach ($path in $registryPaths) {
+            Write-Verbose -Verbose -Message "Looping through $path"
+            if (Test-Path -Path $path) {
+                $installedApps = Get-ChildItem -Path $path -Recurse | Get-ItemProperty | Where-Object {$_.DisplayName -like "*$object*"} | Select-Object Displayname,UninstallString,PSChildName
+                if ($installedApps) {
+                    Write-Verbose -Verbose -Message "Installed applications matching '$object' found in $path"
+                    foreach ($App in $installedApps) {
+                        if ($App.UninstallString) {
+                            if ($App.UninstallString.Contains("MsiExec.exe")) {
+                                try {
+                                    Write-Verbose -Verbose -Message "Uninstalling application: $($App.DisplayName) via $($App.UninstallString)"
+                                    Start-Process 'cmd.exe' -ArgumentList ("/c" + "MsiExec.exe /x" + $($App.PSChildName) + " /quiet" + " /norestart") -Wait
+                                    
+                                } catch {
+                                    Write-Error -Message "Failed to uninstall application: $($App.DisplayName)"
+                                }
                             }
-                        }
-                        if ($App.UninstallString.Contains("unins000.exe")) {
-                            try {
-                                Write-Verbose -Verbose -Message "Uninstalling application: $($App.DisplayName) via $($App.UninstallString)"
-                                Start-Process 'cmd.exe' -ArgumentList ("/c" + $($App.UninstallString) + " /SILENT" + " /NORESTART") -Wait
-                            } catch {
-                                Write-Error -Message "Failed to uninstall application: $($App.DisplayName)"
+                            if ($App.UninstallString.Contains("unins000.exe")) {
+                                try {
+                                    Write-Verbose -Verbose -Message "Uninstalling application: $($App.DisplayName) via $($App.UninstallString)"
+                                    Start-Process 'cmd.exe' -ArgumentList ("/c" + $($App.UninstallString) + " /SILENT" + " /NORESTART") -Wait
+                                } catch {
+                                    Write-Error -Message "Failed to uninstall application: $($App.DisplayName)"
+                                }
                             }
-                        }
-                        else {
-                            # If script reaches this point, the application is installed with an unsupported installer. Feel free to add further mechanisms.
+                            else {
+                                # If script reaches this point, the application is installed with an unsupported installer. Feel free to add further mechanisms.
+                            }
                         }
                     }
                 }
+                else {
+                    Write-Verbose -Verbose -Message "No installed apps that matches displayname: $object found in $path"
+                }
             }
             else {
-                Write-Verbose -Verbose -Message "No installed apps that matches displayname: $displayName found in $path"
+                Write-Verbose -Verbose -Message "Path: $path does not exist"
             }
-        }
-        else {
-            Write-Verbose -Verbose -Message "Path: $path does not exist"
         }
     }
 }
