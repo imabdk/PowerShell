@@ -61,21 +61,7 @@ param(
     [Parameter(Mandatory=$false)]
     [string[]]$TargetAccounts = @(
         '*admin*', 
-        'MAB', 
-        'CFP', 
-        'MOEH', 
-        'IKAS', 
-        'KKL', 
-        'JBRA', 
-        'JEBO', 
-        'OMKA', 
-        'ALSI', 
-        'JIK', 
-        'OLLJ', 
-        'MSD', 
-        'JBS', 
-        'RAHA', 
-        'ZAAK'
+        'Martin*' 
     )
 )
 
@@ -222,4 +208,5 @@ try {
 catch {
     Write-Error "An error occurred: $($_.Exception.Message)"
     Write-Error $_.Exception.StackTrace
+
 }
