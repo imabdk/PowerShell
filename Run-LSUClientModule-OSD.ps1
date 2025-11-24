@@ -1,101 +1,113 @@
-﻿<#
-.SYNOPSIS
-    Load and run the LSUClient PowerShell module. Used for installing Lenovo BIOS and Drivers during OSD with Configuration Manager
-   
-.DESCRIPTION
-    Same as above
+<#
+Lenovo Driver & BIOS Update via LSUClient - ConfigMgr Task Sequence
+#>
 
-.NOTES
-    Filename: Run-LSUClientModule-OSD.ps1
-    Version: 1.0
-    Author: Martin Bengtsson
-    Blog: www.imab.dk
-    Twitter: @mwbengtsson
+$ErrorActionPreference = 'Continue'
 
-.LINK
-    https://www.imab.dk/install-lenovo-drivers-and-bios-directly-from-lenovos-driver-catalog-during-osd-using-configuration-manager/
-    
-#> 
+$companyName = "Kromann Reumert"
+$regRoot     = "HKLM:\SOFTWARE\$companyName\OSDDrivers"
+$maxRounds   = 2
 
-$companyName = "imab.dk"
-$global:regKey = "HKLM:\SOFTWARE\$companyName\OSDDrivers"
-function Get-LenovoComputerModel() {
-    $lenovoVendor = (Get-CimInstance -ClassName Win32_ComputerSystemProduct).Vendor
-    if ($lenovoVendor = "LENOVO") {
-        Write-Verbose -Verbose "Lenovo device is detected. Continuing."
-        $global:lenovoModel = (Get-CimInstance -ClassName Win32_ComputerSystemProduct).Version
-        $modelRegEx = [regex]::Match((Get-CimInstance -ClassName CIM_ComputerSystem -ErrorAction SilentlyContinue -Verbose:$false).Model, '^\w{4}')
-        if ($modelRegEx.Success -eq $true) {
-            $global:lenovoModelNumber = $modelRegEx.Value
-            Write-Verbose -Verbose "Lenovo modelnumber: $global:lenovoModelNumber - Lenovo model: $global:lenovoModel"
-        } else {
-            Write-Verbose -Verbose "Failed to retrieve computermodel"
-        } 
-    } else {
-        Write-Verbose -Verbose "Not a Lenovo device. Aborting."
-        exit 1
-    }  
+# Logging - clean and simple
+try { $tsenv = New-Object -ComObject Microsoft.SMS.TSEnvironment } catch { $tsenv = $null }
+$logBuffer = New-Object System.Collections.ArrayList
+function Log([string]$msg) {
+    $line = "[LSUClient] $msg"
+    Write-Output $line
+    if ($tsenv) { [void]$logBuffer.Add("$line`r`n") }
 }
-function Load-LSUClientModule() {
-    if (-NOT(Get-Module -Name LSUClient)) {
-        Write-Verbose -Verbose "LSUClient module not loaded. Continuing."
-        if (Get-Module -Name LSUClient -ListAvailable) {
-            Write-Verbose -Verbose "LSUClient module found available. Try importing and loading it."
-            try {
-                Import-Module -Name LSUClient
-                Write-Verbose -Verbose "Successfully imported and loaded the LSUClient module."
-            } catch {
-                Write-Verbose -Verbose "Failed to import the LSUClient module. Aborting."
-                exit 1
+
+Log "Lenovo LSUClient update started"
+
+# Clean registry at start of each run
+if (Test-Path $regRoot) { Remove-Item $regRoot -Recurse -Force -ErrorAction Stop }
+New-Item $regRoot -Force | Out-Null
+Log "Registry cleaned: $regRoot"
+
+# Lenovo check
+$cs = Get-CimInstance Win32_ComputerSystemProduct
+if ($cs.Vendor -notlike "*Lenovo*") { Log "Not Lenovo - skipping"; exit 0 }
+Log "Lenovo detected: $($cs.Name) ($($cs.Version))"
+
+# Module
+try {
+    Import-Module LSUClient -Force -ErrorAction Stop
+    Log "LSUClient loaded v$((Get-Module LSUClient).Version)"
+} catch {
+    Log "LSUClient module missing"
+    exit 0
+}
+
+# Update loop
+$mandatoryReboot = $false
+$regProperties = @{}
+$installedUpdates = @{}  # Track updates installed during THIS run only
+
+for ($round = 1; $round -le $maxRounds; $round++) {
+    Log "Round $round of $maxRounds"
+
+    $updates = Get-LSUpdate | Where-Object { $_.Installer.Unattended }
+
+    if (-not $updates) {
+        Log "No more unattended updates"
+        break
+    }
+
+    # Filter out already installed updates
+    $updates = $updates | Where-Object { -not $installedUpdates.ContainsKey($_.ID) }
+
+    if (-not $updates) {
+        Log "All available updates already installed in this run"
+        break
+    }
+
+    Log "Processing $($updates.Count) new update(s)"
+
+    foreach ($u in $updates) {
+        Log "Installing: $($u.Title) [$($u.ID)]"
+
+        try {
+            $results = Install-LSUpdate $u
+
+            $regProperties[$u.ID] = $u.Title
+            $installedUpdates[$u.ID] = $true  # Mark as installed for subsequent rounds
+
+            # Log the actual PendingAction value
+            $pendingAction = $results.PendingAction
+            Log "PendingAction: $pendingAction"
+
+            if ($results.PendingAction -contains 'REBOOT_MANDATORY' -or $results.PendingAction -contains 'SHUTDOWN') {
+                $mandatoryReboot = $true
+                Log "Success - MANDATORY reboot required"
+            } else {
+                Log "Success"
             }
         }
-    } else {
-        Write-Verbose -Verbose "LSUClient module already imported and loaded."
+        catch {
+            Log "FAILED: $_"
+            $regProperties["$($u.ID)_ERROR"] = "$($u.Title): $_"
+            $installedUpdates[$u.ID] = $true  # Mark to avoid retry in next round
+        }
     }
 }
-#Function for locating and installing all drivers and BIOS which can be installed silent and unattended
-function Run-LSUClientModuleDefault() {
-    $regKey = $global:regKey
-    if (-NOT(Test-Path -Path $regKey)) { New-Item -Path $regKey -Force | Out-Null }
-    $updates = Get-LSUpdate | Where-Object { $_.Installer.Unattended }
-    foreach ($update in $updates) {
-        Install-LSUpdate $update -Verbose
-        New-ItemProperty -Path $regKey -Name $update.ID -Value $update.Title -Force | Out-Null
-    }
+
+# Final registry stamps
+$now = Get-Date -Format "yyyy-MM-dd HH:mm"
+$regProperties["_LastRun_TS"] = $now
+$regProperties["_LenovoModel"] = $cs.Name
+$regProperties["_LenovoModelNumber"] = $cs.Version
+$regProperties["_RebootRequired"] = $mandatoryReboot
+$regProperties["_ScriptVersion"] = "2025.11.23-Optimized"
+
+# Write all registry properties in batch
+foreach ($key in $regProperties.Keys) {
+    New-ItemProperty $regRoot -Name $key -Value $regProperties[$key] -Force | Out-Null
 }
-#Exclude Intel Graphics Driver
-#Some weird shit going on with the package here on certain models, making the script run forever, thus exlcuding the driver
-function Run-LSUClientModuleCustom() {
-    $regKey = $global:regKey
-    if (-NOT(Test-Path -Path $regKey)) { New-Item -Path $regKey -Force | Out-Null }
-    $updates = Get-LSUpdate | Where-Object { $_.Installer.Unattended -AND $_.Title -notlike "Intel HD Graphics Driver*"}
-    foreach ($update in $updates) {
-        Install-LSUpdate $update -Verbose
-        New-ItemProperty -Path $regKey -Name $update.ID -Value $update.Title -Force | Out-Null
-    }
+
+# Flush log buffer to TS environment
+if ($tsenv -and $logBuffer.Count -gt 0) {
+    $tsenv.Value("LenovoLSULog") = $logBuffer -join ''
 }
-try {
-    Write-Verbose -Verbose "Script is running."
-    Get-LenovoComputerModel
-    Load-LSUClientModule
-    if ($global:lenovoModelNumber -eq "20QF") {
-        Write-Verbose -Verbose "Running LSUClient with custom function"
-        Run-LSUClientModuleCustom
-    } else {
-        Write-Verbose -Verbose "Running LSUClient with default function"
-        Run-LSUClientModuleDefault
-    }
-}
-catch [Exception] {
-    Write-Verbose -Verbose "Script failed to carry out one or more actions."
-    Write-Verbose -Verbose $_.Exception.Message
-    exit 1
-}
-finally { 
-    $currentDate = Get-Date -Format g
-    if (-NOT(Test-Path -Path $regKey)) { New-Item -Path $regKey -Force | Out-Null }
-    New-ItemProperty -Path $regKey -Name "_RunDateTime" -Value $currentDate -Force | Out-Null
-    New-ItemProperty -Path $regKey -Name "_LenovoModelNumber" -Value $global:lenovoModelNumber -Force | Out-Null
-    New-ItemProperty -Path $regKey -Name "_LenovoModel" -Value $global:lenovoModel -Force | Out-Null
-    Write-Verbose -Verbose "Script is done running."
-}
+
+Log "LSUClient finished. Mandatory reboot: $mandatoryReboot"
+if ($mandatoryReboot) { exit 3010 } else { exit 0 }
