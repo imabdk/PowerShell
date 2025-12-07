@@ -1,212 +1,230 @@
 <#
 .SYNOPSIS
-    Configure uBlock Origin Lite extension via Group Policy for Microsoft Edge and Google Chrome
+    Configure uBlock Origin Lite extension via Group Policy for Microsoft Edge or Google Chrome
 
 .DESCRIPTION
     Deploys uBlock Origin Lite (Manifest V3) extension configuration via registry-based Group Policy.
     Runs in SYSTEM context and configures HKLM registry keys.
     Provides simplified configuration suitable for the future-proof MV3 version.
+    
+    Extension installation is handled separately by Intune - this script only configures settings.
+
+.PARAMETER Browser
+    Target browser(s). Options: "Edge", "Chrome", or both. Default: "Edge"
+
+.PARAMETER RemoveConfiguration
+    Set to $true to remove all uBlock Origin Lite policies instead of configuring them
+
+.PARAMETER DefaultFiltering
+    Default filtering mode. Options: "none", "basic", "optimal", "complete"
+
+.PARAMETER ShowBlockedCount
+    Show blocked count on extension icon. 1 = true, 0 = false
+
+.PARAMETER StrictBlockMode
+    Strict block mode. 1 = true, 0 = false
+
+.PARAMETER DisableFirstRunPage
+    Disable first run page. 1 = true, 0 = false
+
+.PARAMETER NoFiltering
+    Trusted sites where uBlock Lite will be disabled. JSON array format: '["example.com", "trusted-site.org"]'
+
+.PARAMETER DisabledFeatures
+    Disable specific user-facing features. JSON array format: '["dashboard", "develop", "filteringMode", "picker", "zapper"]'
+    Options: dashboard (prevent setting changes), develop (prevent developer mode), filteringMode (prevent filtering mode changes), picker (prevent custom filters), zapper (prevent element removal)
+
+.PARAMETER Rulesets
+    Enable/disable specific rulesets. JSON array format: '["+default", "+adguard-url-tracking", "-easylist-cookies"]'
+    Use + to enable, - to disable. Special value "-*" disables all non-default rulesets. See https://github.com/uBlockOrigin/uBOL-home/blob/main/chromium/rulesets/ruleset-details.json for ruleset IDs
+    
+    Default rulesets (already enabled): ublock-filters, ublock-badware, ublock-privacy, ublock-unbreak, easylist, easyprivacy, plowe-0, urlhaus-full
+    
+    Common additional rulesets to enable:
+    - adguard-spyware-url: Removes tracking parameters from URLs (AdGuard URL Tracking Protection)
+    - annoyances-cookies: Blocks cookie consent notices (EasyList/uBO)
+    - annoyances-overlays: Blocks popups and overlay notices (EasyList/uBO)
+    - annoyances-social: Blocks social widgets (EasyList)
+    - annoyances-notifications: Blocks notification prompts (EasyList)
+    - adguard-mobile: Mobile-specific ad blocking (AdGuard/uBO)
+    
+    Example: '["+default", "+adguard-spyware-url", "+annoyances-cookies", "+annoyances-overlays"]'
 
 .NOTES
     Author: Martin Bengtsson
+    Blog: https://www.imab.dk
     Requires: Administrator privileges
     Extension: uBlock Origin Lite (Manifest V3)
-    Benefits: Future-proof, compatible with Chrome's Manifest V3 requirements
+    Extension ID (Edge): cimighlppcgcoapaliogpjjdehbnofhn
+    Extension ID (Chrome): ddkjiahejlhfcafbddmgiahcphecmpfh
 #>
 
 #Requires -RunAsAdministrator
 
-# ============================================
-# Configuration
-# ============================================
+Param(
+    [ValidateSet("Edge", "Chrome")]
+    [string[]]$Browser = @("Edge", "Chrome"),
 
-# --- Script Behavior ---
-$RemoveConfiguration = $false  # Set to $true to REMOVE all uBlock Origin Lite policies instead of configuring them
+    [bool]$RemoveConfiguration = $false,
 
-# --- Browser Selection ---
-$ConfigureEdge = $true         # Configure Microsoft Edge
-$ConfigureChrome = $true       # Configure Google Chrome
+    [ValidateSet("none", "basic", "optimal", "complete")]
+    [string]$DefaultFiltering = "optimal",
 
-# --- Extension Installation ---
-$InstallExtension = $true      # Force-install the extension automatically
+    [ValidateRange(0, 1)]
+    [int]$ShowBlockedCount = 1,
 
-# --- Internal ---
-$LogPrefix = "[uBlock-Lite]"
+    [ValidateRange(0, 1)]
+    [int]$StrictBlockMode = 1,
 
-# ============================================
-# uBlock Origin Lite Settings
-# ============================================
+    [ValidateRange(0, 1)]
+    [int]$DisableFirstRunPage = 1,
 
-# Default Filtering Mode
-# Options: "none", "basic", "optimal", "complete"
-$DefaultFiltering = "optimal"
+    [string]$NoFiltering = '["imab.dk", "contoso.com", "contoso.sharepoint.com", "app.powerbi.com", "community.powerbi.com", "intranet.contoso.com", "portal.contoso.com", "app.bundledocs.com"]',
 
-# Show blocked count on extension icon
-# 1 = true, 0 = false
-$ShowBlockedCount = 1
+    # Available features: "dashboard", "develop", "filteringMode", "picker", "zapper"
+    [string]$DisabledFeatures = '["dashboard"]',
 
-# Strict block mode
-# 1 = true, 0 = false
-$StrictBlockMode = 1
+    # Use +ruleset to enable, -ruleset to disable, -* to disable all except specified
+    # Ruleset IDs: https://github.com/uBlockOrigin/uBOL-home/blob/main/chromium/rulesets/ruleset-details.json
+    [string]$Rulesets = '["+default"]'
+)
 
-# Disable first run page
-# 1 = true, 0 = false
-$DisableFirstRunPage = 1
+# Helper Functions
 
-# Trusted Sites - Sites where uBlock Lite will be disabled
-# JSON array format: '["example.com", "trusted-site.org"]'
-$NoFiltering = '["imab.dk", "mindcore.dk"]'
-
-# ============================================
-# Browser Definitions
-# ============================================
-$browsers = @{
-    "Edge" = @{
-        "Enabled" = $ConfigureEdge
-        "PolicyPath" = "HKLM:\SOFTWARE\Policies\Microsoft\Edge"
-        "ExtensionID" = "cimighlppcgcoapaliogpjjdehbnofhn"
-        "UpdateURL" = "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
-    }
-    "Chrome" = @{
-        "Enabled" = $ConfigureChrome
-        "PolicyPath" = "HKLM:\SOFTWARE\Policies\Google\Chrome"
-        "ExtensionID" = "ddkjiahejlhfcafbddmgiahcphecmpfh"
-        "UpdateURL" = "https://clients2.google.com/service/update2/crx"
+Function Get-BrowserPolicyPath {
+    Param([string]$Browser)
+    if ($Browser -eq "Edge") {
+        return "HKLM:\SOFTWARE\Policies\Microsoft\Edge"
+    } else {
+        return "HKLM:\SOFTWARE\Policies\Google\Chrome"
     }
 }
 
-# ============================================
-# Process Each Browser
-# ============================================
+Function Get-ExtensionID {
+    Param([string]$Browser)
+    if ($Browser -eq "Edge") {
+        return "cimighlppcgcoapaliogpjjdehbnofhn"
+    } else {
+        return "ddkjiahejlhfcafbddmgiahcphecmpfh"
+    }
+}
 
-ForEach ($browserName in $browsers.Keys) {
-    $browser = $browsers[$browserName]
-    
-    If (-Not $browser.Enabled) {
-        Write-Output "$LogPrefix Skipping $browserName (disabled in configuration)"
-        Continue
-    }
-    
-    # Build registry paths
-    $litePolicyPath = "$($browser.PolicyPath)\3rdparty\extensions\$($browser.ExtensionID)\policy"
-    $extensionInstallPath = "$($browser.PolicyPath)\ExtensionInstallForcelist"
-    
-    # ============================================
-    # Remove Configuration Mode
-    # ============================================
-    
-    If ($RemoveConfiguration) {
-        Write-Output "$LogPrefix REMOVING uBlock Origin Lite configuration for $browserName"
-        
-        # Remove from force install list
-        If (Test-Path -Path $extensionInstallPath) {
-            $existingItems = Get-ItemProperty -Path $extensionInstallPath -ErrorAction SilentlyContinue
-            
-            If ($existingItems) {
-                $existingProps = $existingItems.PSObject.Properties | Where-Object { $_.Name -match '^\d+$' }
-                
-                ForEach ($prop in $existingProps) {
-                    If ($prop.Value -like "$($browser.ExtensionID)*") {
-                        Remove-ItemProperty -Path $extensionInstallPath -Name $prop.Name -ErrorAction SilentlyContinue
-                        Write-Output "$LogPrefix Removed from force install list (index: $($prop.Name))."
-                    }
-                }
-            }
-        }
-        
-        # Remove policy configuration
-        If (Test-Path -Path $litePolicyPath) {
-            Remove-Item -Path $litePolicyPath -Recurse -Force -ErrorAction SilentlyContinue
-            Write-Output "$LogPrefix Removed policy configuration."
-        }
-        
-        Write-Output "$LogPrefix $browserName configuration removal completed!"
-        Continue
-    }
-    
-    # ============================================
-    # Normal Configuration Mode
-    # ============================================
-    
-    Write-Output "$LogPrefix Configuring uBlock Origin Lite for $browserName"
-    
-    # ============================================
-    # Extension Force Installation
-    # ============================================
-    
-    If ($InstallExtension) {
-        Write-Output "$LogPrefix Configuring extension force installation for $browserName..."
-        
-        Try {
-            If (-Not (Test-Path -Path $extensionInstallPath)) { 
-                New-Item -Force -Path $extensionInstallPath -ErrorAction Stop | Out-Null
-                Write-Output "$LogPrefix Created ExtensionInstallForcelist registry key for $browserName."
-            }
-            
-            $extensionValue = "$($browser.ExtensionID);$($browser.UpdateURL)"
-            
-            # Check existing extensions and find next available index
-            $existingItems = Get-ItemProperty -Path $extensionInstallPath -ErrorAction SilentlyContinue
-            $existingProps = $existingItems.PSObject.Properties | Where-Object { $_.Name -match '^\d+$' }
-            
-            # Check if already installed
-            $alreadyInstalled = $existingProps | Where-Object { $_.Value -like "$($browser.ExtensionID)*" } | Select-Object -First 1
-            
-            If ($alreadyInstalled) {
-                Write-Output "$LogPrefix uBlock Origin Lite is already in the $browserName force install list (index: $($alreadyInstalled.Name))."
-            } Else {
-                # Find next available index
-                $nextIndex = If ($existingProps) { (($existingProps.Name | ForEach-Object { [int]$_ }) | Measure-Object -Maximum).Maximum + 1 } Else { 1 }
-            
-                Set-ItemProperty -Path $extensionInstallPath -Name "$nextIndex" -Value $extensionValue -Type String -ErrorAction Stop
-                Write-Output "$LogPrefix Added uBlock Origin Lite to $browserName extension force install list (index: $nextIndex)."
-            }
-        }
-        Catch {
-            Write-Output "$LogPrefix ERROR: Failed to configure extension force installation for $browserName - $($_.Exception.Message)"
-            Exit 1
-        }
-    } Else {
-        Write-Output "$LogPrefix Skipping extension force installation for $browserName (disabled in configuration)."
-    }
-    
-    # ============================================
-    # uBlock Origin Lite Configuration
-    # ============================================
-    
-    Write-Output "$LogPrefix Configuring uBlock Origin Lite for $browserName..."
+Function Get-ExtensionPolicyPath {
+    Param(
+        [string]$Browser,
+        [string]$ExtensionID
+    )
+    return "$(Get-BrowserPolicyPath $Browser)\3rdparty\extensions\$ExtensionID\policy"
+}
+
+Function Set-RegistryProperty {
+    Param(
+        [string]$Path,
+        [string]$Name,
+        [object]$Value,
+        [ValidateSet("String", "DWord")]
+        [string]$Type
+    )
     
     Try {
-        If (-Not (Test-Path -Path $litePolicyPath)) {
-            New-Item -Force -Path $litePolicyPath -ErrorAction Stop | Out-Null
-            Write-Output "$LogPrefix Created policy path for uBlock Origin Lite."
-        }
-        
-        # Apply configuration settings
-        $settings = @(
-            @{ Name = "defaultFiltering"; Value = $DefaultFiltering; Type = "String" }
-            @{ Name = "showBlockedCount"; Value = $ShowBlockedCount; Type = "DWord" }
-            @{ Name = "strictBlockMode"; Value = $StrictBlockMode; Type = "DWord" }
-            @{ Name = "disableFirstRunPage"; Value = $DisableFirstRunPage; Type = "DWord" }
-            @{ Name = "noFiltering"; Value = $NoFiltering; Type = "String" }
-        )
-        
-        ForEach ($setting in $settings) {
-            Set-ItemProperty -Path $litePolicyPath -Name $setting.Name -Value $setting.Value -Type $setting.Type -ErrorAction Stop
-        }
-        
-        Write-Output "$LogPrefix Applied configuration for uBlock Origin Lite."
+        New-ItemProperty -Path $Path -Name $Name -PropertyType $Type -Value $Value -Force -ErrorAction Stop | Out-Null
+        Write-Output "$LogPrefix Set '$Name' successfully"
     }
     Catch {
-        Write-Output "$LogPrefix ERROR: Failed to configure uBlock Origin Lite - $($_.Exception.Message)"
-        Exit 1
+        Write-Output "$LogPrefix ERROR: Failed to set '$Name' - $($_.Exception.Message)"
+    }
+}
+
+Function Initialize-ExtensionPath {
+    Param(
+        [string]$Browser,
+        [string]$ExtensionID
+    )
+    
+    $extensionPath = Get-ExtensionPolicyPath -Browser $Browser -ExtensionID $ExtensionID
+    
+    Try {
+        if (-not (Test-Path $extensionPath)) {
+            New-Item -Path $extensionPath -Force -ErrorAction Stop | Out-Null
+        }
+        return $extensionPath
+    }
+    Catch {
+        Write-Output "$LogPrefix ERROR: Failed to create registry path - $($_.Exception.Message)"
+        return $null
+    }
+}
+
+Function Remove-ExtensionConfiguration {
+    Param(
+        [string]$Browser,
+        [string]$ExtensionID
+    )
+    
+    Write-Output "$LogPrefix REMOVING configuration for $Browser"
+    
+    $policyPath = Get-ExtensionPolicyPath -Browser $Browser -ExtensionID $ExtensionID
+    
+    if (Test-Path -Path $policyPath) {
+        Try {
+            Remove-Item -Path $policyPath -Recurse -Force -ErrorAction Stop
+            Write-Output "$LogPrefix Removed policy configuration"
+        }
+        Catch {
+            Write-Output "$LogPrefix ERROR: Failed to remove configuration - $($_.Exception.Message)"
+            Exit 1
+        }
     }
     
-    Write-Output "$LogPrefix $browserName configuration completed successfully!"
+    Write-Output "$LogPrefix Configuration removal completed!"
+    Exit 0
+}
 
-} # End ForEach browser
+# Configuration
 
-Write-Output "$LogPrefix All browser operations completed successfully!"
+$LogPrefix = "[uBlock-Lite]"
 
-# Exit with success code for Intune
+# Remove Configuration Mode
+
+If ($RemoveConfiguration) {
+    foreach ($BrowserName in $Browser) {
+        $extensionID = Get-ExtensionID -Browser $BrowserName
+        Remove-ExtensionConfiguration -Browser $BrowserName -ExtensionID $extensionID
+    }
+}
+
+# Apply Configuration
+
+$settings = @(
+    @{ Name = "defaultFiltering"; Value = $DefaultFiltering; Type = "String" }
+    @{ Name = "showBlockedCount"; Value = $ShowBlockedCount; Type = "DWord" }
+    @{ Name = "strictBlockMode"; Value = $StrictBlockMode; Type = "DWord" }
+    @{ Name = "disableFirstRunPage"; Value = $DisableFirstRunPage; Type = "DWord" }
+    @{ Name = "noFiltering"; Value = $NoFiltering; Type = "String" }
+    @{ Name = "disabledFeatures"; Value = $DisabledFeatures; Type = "String" }
+    @{ Name = "rulesets"; Value = $Rulesets; Type = "String" }
+)
+
+foreach ($BrowserName in $Browser) {
+    $extensionID = Get-ExtensionID -Browser $BrowserName
+
+    Write-Output "$LogPrefix Configuring for $BrowserName"
+
+    $litePolicyPath = Initialize-ExtensionPath -Browser $BrowserName -ExtensionID $extensionID
+
+    if (-not $litePolicyPath) {
+        Write-Output "$LogPrefix ERROR: Failed to initialize extension path for $BrowserName"
+        Exit 1
+    }
+
+    foreach ($setting in $settings) {
+        Write-Output "$LogPrefix Applying setting: $($setting.Name) = $($setting.Value)"
+        Set-RegistryProperty -Path $litePolicyPath -Name $setting.Name -Value $setting.Value -Type $setting.Type | Out-Null
+    }
+
+    Write-Output "$LogPrefix Configuration completed successfully for $BrowserName!"
+}
+
+Write-Output "$LogPrefix Restart browser(s) for changes to take effect"
+
 Exit 0
