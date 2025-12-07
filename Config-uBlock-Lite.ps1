@@ -3,11 +3,8 @@
     Configure uBlock Origin Lite extension via Group Policy for Microsoft Edge or Google Chrome
 
 .DESCRIPTION
-    Deploys uBlock Origin Lite (Manifest V3) extension configuration via registry-based Group Policy.
-    Runs in SYSTEM context and configures HKLM registry keys.
-    Provides simplified configuration suitable for the future-proof MV3 version.
-    
-    Extension installation is handled separately by Intune - this script only configures settings.
+    Configures uBlock Origin Lite (Manifest V3) extension via registry-based Group Policy.
+    Runs in SYSTEM context and writes settings to HKLM registry keys.
 
 .PARAMETER Browser
     Target browser(s). Options: "Edge", "Chrome", or both. Default: "Edge"
