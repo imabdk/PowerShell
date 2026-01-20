@@ -51,7 +51,7 @@
         - GroupMember.Read.All
 
 .LINK
-    https://github.com/yourrepo/Get-MgUserAuthenticationMethodStatus
+    https://www.imab.dk/how-to-get-there-from-here-monitor-passkey-and-phishing-resistant-mfa-user-adoption-with-powershell/
 #>
 
 [CmdletBinding()]
