@@ -36,6 +36,7 @@
     Checks Passkey enrollment for members of multiple groups.
 
 .NOTES
+    Version: 1.0.0
     Authors: Martin Bengtsson (imab.dk), Christian Frohn (christianfrohn.dk)
     Podcast: How To Get There From Here | HowToGetThereFromHere.com
     
@@ -120,13 +121,18 @@ $checkingLabel = $methodConfig[$CheckMethod].Label
 $csvFileName = $methodConfig[$CheckMethod].FileName
 
 # Display banner
-Write-Host "`n$('=' * 70)" -ForegroundColor Cyan
-Write-Host "  MFA Authentication Method Report" -ForegroundColor Cyan
-Write-Host "  Martin Bengtsson | imab.dk" -ForegroundColor Gray
-Write-Host "  Christian Frohn  | christianfrohn.dk" -ForegroundColor Gray
-Write-Host ""
-Write-Host "  Podcast: How To Get There From Here | HowToGetThereFromHere.com" -ForegroundColor Gray
-Write-Host "$('=' * 70)`n" -ForegroundColor Cyan
+$banner = @"
+
+======================================================================
+  MFA Authentication Method Report
+  Martin Bengtsson | imab.dk
+  Christian Frohn  | christianfrohn.dk
+
+  Podcast: How To Get There From Here | HowToGetThereFromHere.com
+======================================================================
+
+"@
+Write-Host $banner -ForegroundColor Cyan
 
 try {
     Write-Host "[1/4] Connecting to Microsoft Graph..." -ForegroundColor Yellow
@@ -179,8 +185,8 @@ try {
     # Set CSV path and initialize collection
     $csvExportData = @()
     if ($ExportCsv) {
-        if (-NOT(Test-Path $pathCsvFile)) { New-Item -Path $pathCsvFile -ItemType Directory -Force | Out-Null}
-        $csvPath = Join-Path -Path $pathCsvFile -ChildPath $csvFileName
+        if (-NOT(Test-Path $PathCsvFile)) { New-Item -Path $PathCsvFile -ItemType Directory -Force | Out-Null}
+        $csvPath = Join-Path -Path $PathCsvFile -ChildPath $csvFileName
     }
     
     Write-Host "`n[3/4] Checking authentication methods..." -ForegroundColor Yellow
@@ -276,8 +282,12 @@ try {
     Write-Progress -Activity "Checking authentication methods" -Completed
     
     # Export all CSV data at once (more efficient than appending in loop)
-    if ($ExportCsv -and $csvExportData.Count -gt 0) {
-        $csvExportData | Export-Csv -Path $csvPath -Encoding UTF8 -NoTypeInformation
+    if ($ExportCsv) {
+        if ($csvExportData.Count -gt 0) {
+            $csvExportData | Export-Csv -Path $csvPath -Encoding UTF8 -NoTypeInformation
+        } else {
+            Write-Host "      No users missing authentication methods - CSV not created" -ForegroundColor Gray
+        }
     }
     Write-Host
     Write-Host "[4/4] Report completed" -ForegroundColor Yellow
@@ -300,7 +310,7 @@ try {
     Write-Host "Total users checked:   $($allMgUsers.Count)" -ForegroundColor White
     Write-Host "Users enrolled:        $($allMgUsers.Count - $usersNeedingAttention.Count)" -ForegroundColor Green
     Write-Host "Users missing method:  $($usersNeedingAttention.Count)" -ForegroundColor Red
-    if ($ExportCsv) {
+    if ($ExportCsv -and $csvExportData.Count -gt 0) {
         Write-Host "`nCSV Report saved to: $csvPath" -ForegroundColor White
     }
     Write-Host "$('=' * 70)`n" -ForegroundColor Cyan
@@ -309,4 +319,8 @@ catch {
     Write-Host "`nERROR: Failed to process authentication methods" -ForegroundColor Red
     Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host "At line: $($_.InvocationInfo.ScriptLineNumber)" -ForegroundColor Yellow
+}
+finally {
+    # Disconnect from Microsoft Graph
+    Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
 }
